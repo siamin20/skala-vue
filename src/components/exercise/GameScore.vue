@@ -41,7 +41,11 @@ const matchStyle = computed(() => {
   }
 })
 
-// 3. 상태에 따라 점수를 보여줄지 정한다 (예정·취소는 점수가 없다)
+// 3. 목록 카드는 폭이 좁아 'KIA 타이거즈' 가 잘린다.
+//     앞 낱말만 쓰면 'KIA', '롯데' 처럼 짧아져 그대로 들어간다.
+const shortName = (fullName) => fullName.split(' ')[0]
+
+// 4. 상태에 따라 점수를 보여줄지 정한다 (예정·취소는 점수가 없다)
 const hasScore = computed(() => {
   if (props.game === null) {
     return false
@@ -70,12 +74,12 @@ const hasScore = computed(() => {
 
       <span class="line-teams">
         <span class="bar" :style="{ backgroundColor: game.away.color }"></span>
-        <span class="nm">{{ game.away.name }}</span>
+        <span class="nm">{{ shortName(game.away.name) }}</span>
         <span class="mid">
           <template v-if="hasScore">{{ game.awayScore }} : {{ game.homeScore }}</template>
           <template v-else>vs</template>
         </span>
-        <span class="nm right">{{ game.home.name }}</span>
+        <span class="nm right">{{ shortName(game.home.name) }}</span>
         <span class="bar" :style="{ backgroundColor: game.home.color }"></span>
       </span>
     </template>
@@ -151,24 +155,25 @@ const hasScore = computed(() => {
 .line-teams {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   min-width: 0;
+}
+/* 남는 자리는 오른쪽 끝에 몰아 준다 */
+.line-teams .bar:last-child {
+  margin-right: auto;
 }
 .line .bar {
   flex-shrink: 0;
   width: 3px;
   height: 12px;
 }
-/* 팀 이름이 길면 말줄임표로 줄여서 카드를 넘지 않게 한다 */
+/* 짧은 이름이라 늘리지 않고 제 폭만 차지하게 둔다 */
 .nm {
-  flex: 1;
   min-width: 0;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-}
-.nm.right {
-  text-align: right;
+  font-weight: 600;
 }
 .mid {
   flex-shrink: 0;
