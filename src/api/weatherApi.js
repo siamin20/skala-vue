@@ -18,12 +18,43 @@ export const getWeather = async (query) => {
   return response.data
 }
 
-// 2. 대기오염 정보. 이쪽은 도시명이 아니라 위도·경도로만 부를 수 있다.
+// 2. 날씨 상태를 우리말로 바꾼다.
+//    OpenWeather 의 한국어 번역은 '온흐림', '튼구름', '실비' 처럼 잘 안 쓰는 말이라
+//    번역 대신 상태 코드(weather[0].id)로 직접 정한다.
+export const skyText = (id) => {
+  if (id >= 200 && id < 300) {
+    return '뇌우'
+  }
+  if (id >= 300 && id < 400) {
+    return '이슬비'
+  }
+  if (id >= 500 && id < 600) {
+    return '비'
+  }
+  if (id >= 600 && id < 700) {
+    return '눈'
+  }
+  if (id >= 700 && id < 800) {
+    return '안개'
+  }
+  if (id === 800) {
+    return '맑음'
+  }
+  if (id === 801) {
+    return '구름 조금'
+  }
+  if (id === 804) {
+    return '흐림'
+  }
+  return '구름'
+}
+
+// 3. 대기오염 정보. 이쪽은 도시명이 아니라 위도·경도로만 부를 수 있다.
 export const getAirPollution = async (lat, lon) => {
   const response = await axios.get(`${BASE_URL}/air_pollution`, {
     params: {
-      lat: lat,
-      lon: lon,
+      lat,
+      lon,
       appid: API_KEY,
     },
   })

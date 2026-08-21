@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router'
 
 import { stadiumList } from '../data/stadiums.js'
 import { todayWeather } from '../data/todayWeather.js'
-import { getWeather } from '../api/weatherApi.js'
+import { getWeather, skyText } from '../api/weatherApi.js'
 import { useMyProfileStore } from '../stores/myProfileStore.js'
 import { useGameStore } from '../stores/gameStore.js'
 import BaseDashboardCard from '../components/exercise/BaseDashboardCard.vue'
@@ -37,7 +37,7 @@ onMounted(async () => {
         id: stadium.id,
         temp: Math.round(data.main.temp),
         feelsLike: Math.round(data.main.feels_like),
-        status: data.weather[0].description,
+        status: skyText(data.weather[0].id),
         sky: data.weather[0].main,
         humidity: data.main.humidity,
         wind: Math.round(data.wind.speed),
