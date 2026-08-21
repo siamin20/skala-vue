@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watch, watchEffect, onMounted } from 'vue'
+import { ref, computed, watch, watchEffect, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { stadiumList } from '../data/stadiums.js'
@@ -24,6 +24,8 @@ const errorMessage = ref('')
 
 // 2. 화면이 붙는 시점에 9개 구장 날씨를 불러온다.
 //    한 도시가 실패해도 나머지는 보여 줘야 하므로 하나씩 순서대로 받는다.
+let timer = 0
+
 onMounted(async () => {
   isLoading.value = true
   errorMessage.value = ''
@@ -59,6 +61,10 @@ onMounted(async () => {
   // 경기 정보는 스토어가 실시간 -> 저장됨 -> 목업 순으로 알아서 물러선다.
   // 무료 호스팅이 깨어나는 데 오래 걸릴 수 있어서 기다리지 않고 화면부터 보여 준다.
   gameStore.loadGames()
+  // 티켓에 붙는 경기 상태도 1분마다 갱신한다
+  timer = setInterval(() => {
+    gameStore.loadGames()
+  }, 60000)
 })
 
 // 3. 경기 목록이 바뀌면 각 구장의 경기 유무를 다시 맞춘다.
@@ -172,6 +178,10 @@ const selectCard = (cityId) => {
 const goDetail = (cityId) => {
   router.push(`/weather/${cityId}`)
 }
+
+onUnmounted(() => {
+  clearInterval(timer)
+})
 </script>
 
 <template>

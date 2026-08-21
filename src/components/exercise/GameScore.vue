@@ -51,28 +51,35 @@ const hasScore = computed(() => {
 </script>
 
 <template>
-  <!-- 목록 카드 안: 한 줄 -->
-  <p v-if="compact" class="line">
-    <template v-if="game === null">오늘 경기 없음</template>
+  <!-- 목록 카드 안: 좁아서 두 줄로 나눈다 -->
+  <div v-if="compact" class="line">
+    <span v-if="game === null" class="none">오늘 경기 없음</span>
     <template v-else>
-      <el-tag :type="tagType(game.status)" size="small" effect="dark">{{
-        game.statusLabel
-      }}</el-tag>
-      <span class="bar" :style="{ backgroundColor: game.away.color }"></span>
-      {{ game.away.name }}
-      <template v-if="hasScore"> {{ game.awayScore }} : {{ game.homeScore }} </template>
-      <template v-else> vs </template>
-      {{ game.home.name }}
-      <span class="bar" :style="{ backgroundColor: game.home.color }"></span>
-      <span class="tail">{{
-        game.note
-          ? game.note
-          : game.status === 'LIVE'
-            ? `${game.inning}회${game.half}`
-            : game.startTime
-      }}</span>
+      <span class="line-head">
+        <el-tag :type="tagType(game.status)" size="small" effect="dark">{{
+          game.statusLabel
+        }}</el-tag>
+        <span class="when">{{
+          game.note
+            ? game.note
+            : game.status === 'LIVE'
+              ? `${game.inning}회${game.half}`
+              : game.startTime
+        }}</span>
+      </span>
+
+      <span class="line-teams">
+        <span class="bar" :style="{ backgroundColor: game.away.color }"></span>
+        <span class="nm">{{ game.away.name }}</span>
+        <span class="mid">
+          <template v-if="hasScore">{{ game.awayScore }} : {{ game.homeScore }}</template>
+          <template v-else>vs</template>
+        </span>
+        <span class="nm right">{{ game.home.name }}</span>
+        <span class="bar" :style="{ backgroundColor: game.home.color }"></span>
+      </span>
     </template>
-  </p>
+  </div>
 
   <!-- 상세 화면: 스코어보드 -->
   <div v-else-if="game === null" class="board empty">
@@ -115,30 +122,57 @@ const hasScore = computed(() => {
   border-radius: 0;
 }
 
-/* 한 줄 버전 — 테두리 없이 카드 안에 얹는다 */
+/* 목록 카드 안 — 폭이 좁아 한 줄에 다 못 들어가므로 위아래로 나눈다 */
 .line {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 4px 5px;
-  margin: 0;
+  flex-direction: column;
+  gap: 5px;
   min-width: 0;
+  margin: 0;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 11.5px;
   color: #1a1a1a;
 }
+.none {
+  color: #6d6a63;
+}
+.line-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.when {
+  color: #6d6a63;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.line-teams {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
 .line .bar {
+  flex-shrink: 0;
   width: 3px;
   height: 12px;
 }
-.tail {
-  margin-left: auto;
-  color: #6d6a63;
+/* 팀 이름이 길면 말줄임표로 줄여서 카드를 넘지 않게 한다 */
+.nm {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
-/* 카드 폭이 좁을 때 팀 이름이 줄바꿈되도록 둔다 */
-.line > span,
-.line {
-  overflow-wrap: anywhere;
+.nm.right {
+  text-align: right;
+}
+.mid {
+  flex-shrink: 0;
+  font-weight: 600;
 }
 
 .board {

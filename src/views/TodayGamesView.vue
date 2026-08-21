@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { stadiumList } from '../data/stadiums.js'
@@ -16,8 +16,19 @@ const router = useRouter()
 // 1. 취소된 경기를 목록에서 빼는 스위치
 const hideCanceled = ref(false)
 
+// 경기 상태는 저녁 내내 예정에서 진행, 종료로 바뀐다.
+// 화면을 열어 둔 채로도 따라가도록 1분마다 다시 받아 온다.
+let timer = 0
+
 onMounted(async () => {
   await gameStore.loadGames()
+  timer = setInterval(() => {
+    gameStore.loadGames()
+  }, 60000)
+})
+
+onUnmounted(() => {
+  clearInterval(timer)
 })
 
 // 2. 경기에 구장 이름과 그 구장 날씨를 붙인다
