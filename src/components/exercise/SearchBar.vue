@@ -31,7 +31,7 @@ const changeKeyword = (event) => {
       type="text"
       :value="keyword"
       @input="changeKeyword"
-      placeholder="도시 이름을 입력하세요 (예: 서울, 대구)"
+      placeholder="도시 이름 (예: 서울, 대구)"
     />
 
     <p v-if="keyword.trim() === ''" class="guide">
@@ -45,26 +45,24 @@ const changeKeyword = (event) => {
 <style scoped>
 input {
   width: 100%;
-  padding: 13px 18px;
-  background-color: #faf8f2;
-  border: 1px solid #e6e0d1;
-  border-radius: 24px;
+  padding: 9px 12px;
+  background-color: #fff;
+  border: 1px solid #9b978e;
   font-family: 'IBM Plex Sans KR', sans-serif;
-  font-size: 15px;
-  color: #2f2b24;
+  font-size: 14px;
+  color: #1a1a1a;
   outline: none;
 }
 input:focus {
-  border-color: #3d7a4f;
-  background-color: #fffdf8;
+  border-color: #1a1a1a;
 }
 .guide {
-  margin: 12px 0 0 4px;
-  font-size: 13.5px;
-  color: #8b8271;
+  margin: 9px 0 0 1px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  color: #6d6a63;
 }
 .empty {
-  color: #c0392b;
-  font-weight: 600;
+  color: #b3261e;
 }
 </style>

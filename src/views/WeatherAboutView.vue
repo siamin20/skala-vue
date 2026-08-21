@@ -1,103 +1,97 @@
 <script setup>
-import { useRouter } from 'vue-router'
-
-const router = useRouter()
-
-const goHome = () => {
-  router.push('/')
-}
+import { stadiumList } from '../data/stadiums.js'
 </script>
 
 <template>
   <div>
-    <h1>서비스 소개</h1>
-    <p class="lead">직관 날씨는 야구 보러 가기 전에 딱 한 번 열어 보는 날씨 앱입니다.</p>
-
-    <div class="about-box">
-      <h3>이런 걸 볼 수 있습니다</h3>
-      <ul>
-        <li>KBO 9개 구장의 오늘 날씨를 입장권 모양으로 확인</li>
-        <li>도시 이름으로 검색해서 원하는 구장만 골라 보기</li>
-        <li>구장을 누르면 날씨에 맞춰 직관 준비물을 알려 줌</li>
-        <li>돔구장은 비가 와도 경기가 열린다는 것까지 표시</li>
-      </ul>
+    <div class="page-head">
+      <h1>정보</h1>
     </div>
 
-    <div class="about-box">
-      <h3>왜 만들었나</h3>
-      <p>
-        야구장은 우산 반입이 안 됩니다. 비 소식을 모르고 갔다가 우비도 없이 앉아 있는 일이 많아서,
-        가기 전에 챙길 것을 알려 주는 화면을 만들었습니다.
-      </p>
-    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>도시</th>
+          <th>구장</th>
+          <th>구단</th>
+          <th>개장</th>
+          <th>좌석</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="item in stadiumList" :key="item.id">
+          <td>{{ item.name }}</td>
+          <td>{{ item.stadium }}<span v-if="item.isDome" class="dome">돔</span></td>
+          <td>{{ item.team }}</td>
+          <td class="num">{{ item.opened }}</td>
+          <td class="num">{{ item.seats }}</td>
+        </tr>
+      </tbody>
+    </table>
 
-    <button @click="goHome">대시보드로 돌아가기</button>
+    <dl class="source">
+      <dt>구장 정보</dt>
+      <dd>고정 데이터 (src/data/stadiums.js)</dd>
+      <dt>날씨</dt>
+      <dd>목업 데이터. OpenWeatherMap 연동 예정</dd>
+      <dt>경기 일정</dt>
+      <dd>목업 데이터. 자체 KBO API 연동 예정</dd>
+    </dl>
   </div>
 </template>
 
 <style scoped>
+.page-head {
+  padding-bottom: 10px;
+  margin-bottom: 18px;
+  border-bottom: 2px solid #1a1a1a;
+}
 h1 {
-  margin: 0 0 8px 0;
-  font-family: 'Black Han Sans', sans-serif;
-  font-size: 38px;
-  line-height: 1.2;
-  color: #2f2b24;
-}
-.lead {
-  margin: 0 0 26px 0;
-  font-size: 15px;
-  color: #8b8271;
-}
-.about-box {
-  padding: 20px 24px;
-  margin-bottom: 16px;
-  background-color: #fffdf8;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(47, 43, 36, 0.08);
-}
-.about-box h3 {
-  margin: 0 0 12px 0;
-  font-size: 14px;
-  letter-spacing: 0.02em;
-  color: #3d7a4f;
-}
-.temp {
-  margin: 0 0 8px 0;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 52px;
-  font-weight: 600;
-  line-height: 1;
-  color: #c96f3f;
-}
-.about-box p {
-  margin: 0 0 6px 0;
-  color: #6b6355;
-}
-ul {
   margin: 0;
-  padding-left: 4px;
-  list-style: none;
+  font-family: 'Black Han Sans', sans-serif;
+  font-size: 30px;
 }
-li {
-  padding: 10px 0;
-  border-bottom: 1px dashed #e6e0d1;
-  color: #2f2b24;
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
 }
-li:last-child {
-  border-bottom: none;
-}
-button {
-  padding: 11px 22px;
-  background-color: #2f5d3f;
-  border: none;
-  border-radius: 24px;
-  font-family: 'IBM Plex Sans KR', sans-serif;
-  font-size: 14px;
+th {
+  padding: 8px 10px;
+  border-bottom: 1px solid #1a1a1a;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11.5px;
   font-weight: 500;
-  color: #fffdf8;
-  cursor: pointer;
+  text-align: left;
+  color: #6d6a63;
 }
-button:hover {
-  background-color: #24492f;
+td {
+  padding: 9px 10px;
+  border-bottom: 1px solid #cfccc4;
+}
+.num {
+  font-family: 'IBM Plex Mono', monospace;
+  text-align: right;
+}
+.dome {
+  margin-left: 6px;
+  padding: 1px 5px;
+  border: 1px solid #6d6a63;
+  font-size: 10.5px;
+  color: #6d6a63;
+}
+
+.source {
+  margin: 26px 0 0 0;
+  font-size: 13px;
+}
+.source dt {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11.5px;
+  color: #6d6a63;
+}
+.source dd {
+  margin: 2px 0 12px 0;
 }
 </style>

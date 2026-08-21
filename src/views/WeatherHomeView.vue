@@ -1,35 +1,103 @@
 <script setup>
-import { ref, computed, watch, watchEffect } from 'vue'
+import { ref, computed, watch, watchEffect, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { stadiumList } from '../data/stadiums.js'
 import { todayWeather } from '../data/todayWeather.js'
+import { getWeather } from '../api/weatherApi.js'
+import { getTodayGames } from '../api/kboApi.js'
+import { todayGames } from '../data/todayGames.js'
+import { useMyProfileStore } from '../stores/myProfileStore.js'
 import BaseDashboardCard from '../components/exercise/BaseDashboardCard.vue'
 import SearchBar from '../components/exercise/SearchBar.vue'
 import WeatherCard from '../components/exercise/WeatherCard.vue'
+import GameScore from '../components/exercise/GameScore.vue'
 
 const router = useRouter()
+const myProfileStore = useMyProfileStore()
 
 // 1. 반응형 상태
+//    처음에는 목업으로 화면을 그리고, 마운트된 뒤 실제 날씨로 덮어쓴다.
 const weatherList = ref(todayWeather)
+const isLoading = ref(false)
+const errorMessage = ref('')
+
+// 오늘 경기. 백엔드가 없으면 목업을 그대로 쓴다.
+const gameList = ref(todayGames)
+const gameSource = ref('목업')
+
+// 2. 화면이 붙는 시점에 9개 구장 날씨를 불러온다.
+//    한 도시가 실패해도 나머지는 보여 줘야 하므로 하나씩 순서대로 받는다.
+onMounted(async () => {
+  isLoading.value = true
+  errorMessage.value = ''
+
+  try {
+    const loaded = []
+    for (const stadium of stadiumList) {
+      const data = await getWeather(stadium.query)
+      const before = todayWeather.find((item) => item.id === stadium.id)
+      loaded.push({
+        id: stadium.id,
+        temp: Math.round(data.main.temp),
+        feelsLike: Math.round(data.main.feels_like),
+        status: data.weather[0].description,
+        sky: data.weather[0].main,
+        humidity: data.main.humidity,
+        wind: Math.round(data.wind.speed),
+        lat: data.coord.lat,
+        lon: data.coord.lon,
+        // 경기 유무는 날씨 API 가 주지 않아서 기존 값을 그대로 쓴다
+        hasGame: before.hasGame,
+      })
+    }
+    weatherList.value = loaded
+  } catch (error) {
+    errorMessage.value = '날씨를 불러오지 못했습니다. 목업 데이터로 보여 줍니다.'
+    console.error('[날씨 조회 실패]', error)
+  }
+
+  // 경기 정보는 직접 만든 백엔드에서 받는다. 배포본에는 서버가 없으므로 실패해도 넘어간다.
+  try {
+    const games = await getTodayGames()
+    gameList.value = games
+    gameSource.value = 'KBO 실시간'
+
+    // 실제 경기 일정에 맞춰 각 구장의 경기 유무를 다시 맞춘다.
+    // 가져온 목업 배열을 직접 고치면 원본이 바뀌므로 새 배열을 만든다.
+    const updated = []
+    for (const item of weatherList.value) {
+      updated.push({ ...item, hasGame: games.some((game) => game.cityId === item.id) })
+    }
+    weatherList.value = updated
+  } catch (error) {
+    console.warn('[KBO 백엔드 없음] 목업 경기 정보를 사용합니다.', error.message)
+  }
+
+  isLoading.value = false
+})
 
 const searchQuery = ref('')
-const selectedCityInfo = ref('입장권을 눌러 보세요.')
+const selectedCityInfo = ref('구장을 선택하지 않았습니다.')
+
+// [추가] 펼쳐 놓은 카드의 구장 id. 같은 카드를 다시 누르면 접는다.
+const openedId = ref('')
 
 // 2. 구장 정보와 날씨를 하나로 합친다. 마스코트 표정도 여기서 정한다.
 const ticketList = computed(() => {
   return stadiumList.map((stadium) => {
     const weather = weatherList.value.find((item) => item.id === stadium.id)
-    let face = '😀'
-    if (!weather.hasGame) {
-      face = '😴'
-    } else if (stadium.isDome) {
-      face = '😎'
-    } else if (weather.status === '비') {
-      face = '🥲'
-    } else if (weather.temp >= 33) {
-      face = '🥵'
+    // API 는 Clear / Clouds / Rain 같은 영문 값을 준다. 목업은 sky 가 없어 status 로 판단한다.
+    const sky = weather.sky ? weather.sky : weather.status
+    let skyIcon = '☀️'
+    if (sky === 'Rain' || sky === 'Drizzle' || sky === 'Thunderstorm' || sky === '비') {
+      skyIcon = '🌧️'
+    } else if (sky === 'Snow') {
+      skyIcon = '❄️'
+    } else if (sky === 'Clouds' || sky === '구름') {
+      skyIcon = '☁️'
     }
+
     return {
       id: stadium.id,
       name: stadium.name,
@@ -43,7 +111,10 @@ const ticketList = computed(() => {
       humidity: weather.humidity,
       wind: weather.wind,
       hasGame: weather.hasGame,
-      face: face,
+      lat: weather.lat,
+      lon: weather.lon,
+      emoji: stadium.emoji,
+      skyIcon: skyIcon,
     }
   })
 })
@@ -55,6 +126,13 @@ const filteredWeatherList = computed(() => {
     return ticketList.value
   }
   return ticketList.value.filter((item) => item.name.includes(keyword))
+})
+
+// [추가] 내 응원팀 구장을 맨 위로 올린 목록
+const sortedList = computed(() => {
+  const mine = filteredWeatherList.value.filter((item) => item.id === myProfileStore.teamCityId)
+  const others = filteredWeatherList.value.filter((item) => item.id !== myProfileStore.teamCityId)
+  return mine.concat(others)
 })
 
 // 4. 오늘 경기가 열리는 구장 수 (직접 추가한 computed)
@@ -74,7 +152,32 @@ watchEffect(() => {
   )
 })
 
-// 7. 상세보기를 누르면 알림창 대신 상세 페이지로 이동한다
+// 7. [추가] 어떤 카드를 펼쳤는지 기록한다
+watch(openedId, (newId, oldId) => {
+  console.log(`[watch/추가] 펼친 카드: "${oldId}" -> "${newId}"`)
+})
+
+// 8. 카드를 누르면 상태바 문구를 바꾸고, 그 카드를 펼치거나 접는다
+const selectCard = (cityId) => {
+  const found = ticketList.value.find((item) => item.id === cityId)
+  selectedCityInfo.value = `${found.stadium} 입장권을 확인했습니다.`
+  if (openedId.value === cityId) {
+    openedId.value = ''
+  } else {
+    openedId.value = cityId
+  }
+}
+
+// 9. 펼친 카드에 보여 줄 오늘 경기. 없으면 null 을 넘긴다.
+const findGame = (cityId) => {
+  const found = gameList.value.find((item) => item.cityId === cityId)
+  if (found === undefined) {
+    return null
+  }
+  return found
+}
+
+// 10. 상세보기를 누르면 알림창 대신 상세 페이지로 이동한다
 const goDetail = (cityId) => {
   router.push(`/weather/${cityId}`)
 }
@@ -82,29 +185,18 @@ const goDetail = (cityId) => {
 
 <template>
   <div>
-    <header class="hero">
-      <p class="eyebrow">KBO 9개 구장 · 오늘</p>
-      <h1>오늘 직관 갈까?</h1>
-      <p class="lead">가기 전에 딱 한 번. 날씨 보고 뭘 챙길지 정하세요.</p>
+    <div class="page-head">
+      <h1>오늘의 구장</h1>
+      <p v-if="isLoading" class="count">불러오는 중…</p>
+      <p v-else class="count">
+        <span class="source">{{ gameSource }}</span
+        >경기 {{ gameCount }} / 전체 {{ ticketList.length }}
+      </p>
+    </div>
 
-      <div class="summary">
-        <div class="summary-item">
-          <span class="summary-num">{{ gameCount }}</span>
-          <span class="summary-label">오늘 경기</span>
-        </div>
-        <div class="summary-item">
-          <span class="summary-num">{{ filteredWeatherList.length }}</span>
-          <span class="summary-label">보이는 구장</span>
-        </div>
-        <div class="summary-item">
-          <span class="summary-num">{{ ticketList.length }}</span>
-          <span class="summary-label">전체 구장</span>
-        </div>
-      </div>
-    </header>
+    <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
 
     <BaseDashboardCard>
-      <template #title>🔍 도시 검색</template>
       <SearchBar
         :keyword="searchQuery"
         :total-count="ticketList.length"
@@ -113,90 +205,73 @@ const goDetail = (cityId) => {
       />
     </BaseDashboardCard>
 
-    <h2 class="section-title">🎫 오늘의 입장권</h2>
-    <div class="ticket-grid">
-      <WeatherCard
-        v-for="item in filteredWeatherList"
-        :key="item.id"
-        :city-item="item"
-        @select-card="selectedCityInfo = $event"
-        @click-detail="goDetail"
-      />
-    </div>
+    <BaseDashboardCard>
+      <div class="ticket-grid">
+        <WeatherCard
+          v-for="item in sortedList"
+          :key="item.id"
+          :city-item="item"
+          :is-opened="openedId === item.id"
+          @select-card="selectCard"
+          @click-detail="goDetail"
+        >
+          <GameScore :game="findGame(item.id)" compact />
+        </WeatherCard>
+      </div>
+    </BaseDashboardCard>
 
-    <div class="status-bar">{{ selectedCityInfo }}</div>
+    <p class="status-bar">{{ selectedCityInfo }}</p>
   </div>
 </template>
 
 <style scoped>
-.hero {
-  padding: 8px 0 28px 0;
-}
-.eyebrow {
-  margin: 0 0 8px 0;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 12px;
-  letter-spacing: 0.12em;
-  color: #8b8271;
+.page-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding-bottom: 10px;
+  margin-bottom: 18px;
+  border-bottom: 2px solid #1a1a1a;
 }
 h1 {
-  margin: 0 0 10px 0;
+  margin: 0;
   font-family: 'Black Han Sans', sans-serif;
-  font-size: 46px;
-  line-height: 1.15;
+  font-size: 30px;
   letter-spacing: -0.01em;
-  color: #2f2b24;
 }
-.lead {
-  margin: 0 0 24px 0;
-  font-size: 16px;
-  color: #6b6355;
-}
-
-.summary {
-  display: flex;
-  gap: 10px;
-}
-.summary-item {
-  flex: 0 0 auto;
-  min-width: 108px;
-  padding: 14px 18px;
-  background-color: #fffdf8;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(47, 43, 36, 0.08);
-}
-.summary-num {
-  display: block;
+.count {
+  margin: 0;
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 28px;
-  font-weight: 600;
-  line-height: 1.1;
-  color: #c96f3f;
+  font-size: 13px;
+  color: #6d6a63;
 }
-.summary-label {
-  display: block;
-  margin-top: 4px;
-  font-size: 12.5px;
-  color: #8b8271;
+.source {
+  padding: 2px 7px;
+  margin-right: 7px;
+  border: 1px solid #cfccc4;
+  font-size: 11px;
 }
 
-.section-title {
-  margin: 32px 0 14px 0;
-  font-size: 18px;
-  color: #2f2b24;
+.error {
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  border: 1px solid #b3261e;
+  font-size: 13px;
+  color: #b3261e;
 }
 .ticket-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  align-items: start;
+  gap: 12px;
 }
 
 .status-bar {
-  margin-top: 28px;
-  padding: 14px 20px;
-  background-color: #2f2b24;
-  border-radius: 10px;
-  font-size: 14.5px;
-  color: #f2efe6;
+  margin: 22px 0 0 0;
+  padding: 10px 14px;
+  border: 1px dashed #9b978e;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12.5px;
+  color: #6d6a63;
 }
 </style>

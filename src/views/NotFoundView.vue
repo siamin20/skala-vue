@@ -10,10 +10,9 @@ const goHome = () => {
 
 <template>
   <div class="not-found">
-    <p class="mark">⚾</p>
-    <h1>파울볼입니다</h1>
-    <p class="lead">주소를 다시 확인해 주세요. 찾으시는 페이지가 없습니다.</p>
-    <button @click="goHome">대시보드로 돌아가기</button>
+    <p class="code">404</p>
+    <p class="msg">해당 주소에 연결된 화면이 없습니다.</p>
+    <button @click="goHome">구장 목록으로</button>
   </div>
 </template>
 
@@ -22,33 +21,28 @@ const goHome = () => {
   padding: 90px 0;
   text-align: center;
 }
-.mark {
+.code {
   margin: 0;
-  font-size: 76px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 64px;
+  font-weight: 600;
   line-height: 1;
 }
-h1 {
-  margin: 18px 0 8px 0;
-  font-family: 'Black Han Sans', sans-serif;
-  font-size: 40px;
-  color: #2f2b24;
-}
-.lead {
-  margin: 0 0 26px 0;
-  color: #8b8271;
+.msg {
+  margin: 12px 0 22px 0;
+  font-size: 14px;
+  color: #6d6a63;
 }
 button {
-  padding: 11px 22px;
-  background-color: #2f5d3f;
-  border: none;
-  border-radius: 24px;
+  padding: 9px 18px;
+  background-color: transparent;
+  border: 1px solid #1a1a1a;
   font-family: 'IBM Plex Sans KR', sans-serif;
-  font-size: 14px;
-  font-weight: 500;
-  color: #fffdf8;
+  font-size: 13px;
   cursor: pointer;
 }
 button:hover {
-  background-color: #24492f;
+  background-color: #1a1a1a;
+  color: #fbfaf7;
 }
 </style>

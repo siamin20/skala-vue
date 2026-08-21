@@ -14,6 +14,12 @@ const routes = [
     name: 'WeatherDetail',
     component: () => import('../views/WeatherDetailView.vue'),
   },
+  // [추가 view] 오늘 열리는 경기를 한 화면에 모아 본다
+  {
+    path: '/games',
+    name: 'TodayGames',
+    component: () => import('../views/TodayGamesView.vue'),
+  },
   {
     path: '/about',
     name: 'WeatherAbout',
