@@ -24,8 +24,18 @@ export const useGameStore = defineStore('game', () => {
     return savedDate.value === `${yyyy}-${mm}-${dd}`
   })
 
-  // 3. action — 불러오기. 실패하면 저장해 둔 값으로, 그것도 없으면 목업으로 물러선다.
+  // 3. action — 불러오기.
+  //    무료 호스팅은 깨어나는 데 30초쯤 걸리므로, 저장해 둔 값을 먼저 보여 주고
+  //    응답이 오면 그때 실시간 값으로 바꾼다. 기다리는 동안 화면이 비지 않는다.
   const loadGames = async () => {
+    const saved = localStorage.getItem('lastGames')
+    const savedStamp = localStorage.getItem('lastGamesDate')
+    if (saved) {
+      games.value = JSON.parse(saved)
+      savedDate.value = savedStamp ? savedStamp : ''
+      source.value = '저장됨'
+    }
+
     try {
       const loaded = await getTodayGames()
       games.value = loaded
@@ -39,20 +49,14 @@ export const useGameStore = defineStore('game', () => {
       localStorage.setItem('lastGamesDate', stamp)
       return
     } catch (error) {
-      console.warn('[KBO 백엔드 없음] 저장해 둔 경기 정보를 찾습니다.', error.message)
+      console.warn('[KBO 백엔드 응답 없음]', error.message)
     }
 
-    const saved = localStorage.getItem('lastGames')
-    const savedStamp = localStorage.getItem('lastGamesDate')
-    if (saved) {
-      games.value = JSON.parse(saved)
-      savedDate.value = savedStamp ? savedStamp : ''
-      source.value = '저장됨'
-      return
+    // 저장해 둔 값도 없으면 소스에 적어 둔 목업으로 물러선다
+    if (!saved) {
+      games.value = todayGames
+      source.value = '목업'
     }
-
-    games.value = todayGames
-    source.value = '목업'
   }
 
   // 4. 구장 하나의 경기를 찾는다. 없으면 null.

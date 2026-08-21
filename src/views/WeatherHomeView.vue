@@ -53,22 +53,29 @@ onMounted(async () => {
     console.error('[날씨 조회 실패]', error)
   }
 
-  // 경기 정보는 스토어가 실시간 -> 저장됨 -> 목업 순으로 알아서 물러선다.
-  await gameStore.loadGames()
-
-  // 받아 온 일정에 맞춰 각 구장의 경기 유무를 다시 맞춘다.
-  // 원본 배열을 직접 고치면 다른 화면에도 영향이 가므로 새 배열을 만든다.
-  const updated = []
-  for (const item of weatherList.value) {
-    updated.push({
-      ...item,
-      hasGame: gameStore.games.some((game) => game.cityId === item.id),
-    })
-  }
-  weatherList.value = updated
-
+  // 날씨는 다 받았으니 여기서 로딩 표시를 끝낸다.
   isLoading.value = false
+
+  // 경기 정보는 스토어가 실시간 -> 저장됨 -> 목업 순으로 알아서 물러선다.
+  // 무료 호스팅이 깨어나는 데 오래 걸릴 수 있어서 기다리지 않고 화면부터 보여 준다.
+  gameStore.loadGames()
 })
+
+// 3. 경기 목록이 바뀌면 각 구장의 경기 유무를 다시 맞춘다.
+//    원본 배열을 직접 고치면 다른 화면에도 영향이 가므로 새 배열을 만든다.
+watch(
+  () => gameStore.games,
+  (newGames) => {
+    const updated = []
+    for (const item of weatherList.value) {
+      updated.push({
+        ...item,
+        hasGame: newGames.some((game) => game.cityId === item.id),
+      })
+    }
+    weatherList.value = updated
+  },
+)
 
 const searchQuery = ref('')
 const selectedCityInfo = ref('구장을 선택하지 않았습니다.')
@@ -76,7 +83,7 @@ const selectedCityInfo = ref('구장을 선택하지 않았습니다.')
 // [추가] 펼쳐 놓은 카드의 구장 id. 같은 카드를 다시 누르면 접는다.
 const openedId = ref('')
 
-// 2. 구장 정보와 날씨를 하나로 합친다. 마스코트 표정도 여기서 정한다.
+// 4. 구장 정보와 날씨를 하나로 합친다. 마스코트 표정도 여기서 정한다.
 const ticketList = computed(() => {
   return stadiumList.map((stadium) => {
     const weather = weatherList.value.find((item) => item.id === stadium.id)
@@ -112,7 +119,7 @@ const ticketList = computed(() => {
   })
 })
 
-// 3. 검색어가 도시 이름에 포함된 것만 걸러 낸다
+// 5. 검색어가 도시 이름에 포함된 것만 걸러 낸다
 const filteredWeatherList = computed(() => {
   const keyword = searchQuery.value.trim()
   if (keyword === '') {
@@ -128,29 +135,29 @@ const sortedList = computed(() => {
   return mine.concat(others)
 })
 
-// 4. 오늘 경기가 열리는 구장 수 (직접 추가한 computed)
+// 6. 오늘 경기가 열리는 구장 수 (직접 추가한 computed)
 const gameCount = computed(() => {
   return filteredWeatherList.value.filter((item) => item.hasGame).length
 })
 
-// 5. 상태바 문구가 바뀔 때마다 기록
+// 7. 상태바 문구가 바뀔 때마다 기록
 watch(selectedCityInfo, (newValue, oldValue) => {
   console.log(`[watch] 상태바 변경: "${oldValue}" -> "${newValue}"`)
 })
 
-// 6. 검색어는 감시 대상을 적지 않아도 되는 watchEffect 로 추적
+// 8. 검색어는 감시 대상을 적지 않아도 되는 watchEffect 로 추적
 watchEffect(() => {
   console.log(
     `[watchEffect] 검색어 "${searchQuery.value}" / 결과 ${filteredWeatherList.value.length}곳`,
   )
 })
 
-// 7. [추가] 어떤 카드를 펼쳤는지 기록한다
+// 9. [추가] 어떤 카드를 펼쳤는지 기록한다
 watch(openedId, (newId, oldId) => {
   console.log(`[watch/추가] 펼친 카드: "${oldId}" -> "${newId}"`)
 })
 
-// 8. 카드를 누르면 상태바 문구를 바꾸고, 그 카드를 펼치거나 접는다
+// 10. 카드를 누르면 상태바 문구를 바꾸고, 그 카드를 펼치거나 접는다
 const selectCard = (cityId) => {
   const found = ticketList.value.find((item) => item.id === cityId)
   selectedCityInfo.value = `${found.stadium} 입장권을 확인했습니다.`
@@ -161,7 +168,7 @@ const selectCard = (cityId) => {
   }
 }
 
-// 9. 상세보기를 누르면 알림창 대신 상세 페이지로 이동한다
+// 11. 상세보기를 누르면 알림창 대신 상세 페이지로 이동한다
 const goDetail = (cityId) => {
   router.push(`/weather/${cityId}`)
 }
