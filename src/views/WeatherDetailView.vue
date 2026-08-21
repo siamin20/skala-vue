@@ -223,8 +223,6 @@ const goHome = () => {
         <dd>{{ stadium.opened }}년</dd>
         <dt>좌석</dt>
         <dd>{{ stadium.seats }}석</dd>
-        <dt>지붕</dt>
-        <dd>{{ stadium.isDome ? '돔' : '없음' }}</dd>
       </dl>
 
       <button @click="goHome">구장 목록으로</button>
