@@ -19,7 +19,9 @@ const STADIUM_TO_CITY = {
 }
 
 export const getTodayGames = async () => {
-  const response = await axios.get(`${BASE_URL}/api/games/today`, { timeout: 3000 })
+  // 무료 호스팅은 한동안 요청이 없으면 잠들었다가 깨어나는 데 30초쯤 걸린다.
+  // 그동안 기다려 주되, 그보다 오래 걸리면 저장해 둔 값으로 넘어간다.
+  const response = await axios.get(`${BASE_URL}/api/games/today`, { timeout: 45000 })
 
   // 화면에서 쓰기 좋게 cityId 를 붙여 준다
   const games = []
