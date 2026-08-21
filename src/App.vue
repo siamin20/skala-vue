@@ -9,6 +9,7 @@ import UnitToggler from './components/exercise/UnitToggler.vue'
       <span class="logo">직관 날씨</span>
       <RouterLink to="/">구장</RouterLink>
       <RouterLink to="/games">오늘 경기</RouterLink>
+      <RouterLink to="/saju">닮은 선수</RouterLink>
       <RouterLink to="/about">정보</RouterLink>
 
       <!-- 내비게이션 바 옆에 온도 단위 전환 버튼을 둔다 -->

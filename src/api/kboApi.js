@@ -18,6 +18,16 @@ const STADIUM_TO_CITY = {
   창원: 'changwon',
 }
 
+// 생년월일로 사주 네 기둥을 받아 온다.
+// 연주·월주는 절기 기준이라 날짜 계산으로 구할 수 없어 백엔드가 만세력을 대신 조회해 준다.
+export const getSaju = async (year, month, day) => {
+  const response = await axios.get(`${BASE_URL}/api/saju`, {
+    params: { year: year, month: month, day: day },
+    timeout: 45000,
+  })
+  return response.data
+}
+
 export const getTodayGames = async () => {
   // 무료 호스팅은 한동안 요청이 없으면 잠들었다가 깨어나는 데 30초쯤 걸린다.
   // 그동안 기다려 주되, 그보다 오래 걸리면 저장해 둔 값으로 넘어간다.

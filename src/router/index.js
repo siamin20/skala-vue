@@ -20,6 +20,12 @@ const routes = [
     name: 'TodayGames',
     component: () => import('../views/TodayGamesView.vue'),
   },
+  // [추가 view] 생년월일 사주로 나와 닮은 KBO 선수를 찾는다
+  {
+    path: '/saju',
+    name: 'SajuMatch',
+    component: () => import('../views/SajuMatchView.vue'),
+  },
   {
     path: '/about',
     name: 'WeatherAbout',
