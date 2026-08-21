@@ -13,8 +13,8 @@ const gameStore = useGameStore()
 
 const router = useRouter()
 
-// 1. 취소된 경기만 골라 보는 스위치
-const onlyCanceled = ref(false)
+// 1. 취소된 경기를 목록에서 빼는 스위치
+const hideCanceled = ref(false)
 
 onMounted(async () => {
   await gameStore.loadGames()
@@ -37,12 +37,12 @@ const gameList = computed(() => {
   })
 })
 
-// 3. 스위치에 따라 걸러 낸 목록
+// 3. 스위치를 켜면 취소된 경기를 뺀다
 const shownList = computed(() => {
-  if (onlyCanceled.value === false) {
+  if (hideCanceled.value === false) {
     return gameList.value
   }
-  return gameList.value.filter((item) => item.game.status === 'CANCELED')
+  return gameList.value.filter((item) => item.game.status !== 'CANCELED')
 })
 
 // 4. 취소된 경기 수
@@ -50,8 +50,8 @@ const canceledCount = computed(() => {
   return gameList.value.filter((item) => item.game.status === 'CANCELED').length
 })
 
-watch(onlyCanceled, (newValue) => {
-  console.log(`[watch] 취소 경기만 보기: ${newValue}`)
+watch(hideCanceled, (newValue) => {
+  console.log(`[watch] 취소 경기 제외: ${newValue}`)
 })
 
 const goDetail = (cityId) => {
@@ -64,25 +64,28 @@ const goDetail = (cityId) => {
     <div class="page-head">
       <h1>오늘 경기</h1>
       <p class="count">
-        <span class="source">{{ gameSource }}</span
-        >{{ gameList.length }}경기 · 취소
-        {{ canceledCount }}
+        <span class="source">{{ gameSource }}</span>
+        <span>{{ gameList.length }}경기</span>
+        <span>취소 {{ canceledCount }}</span>
       </p>
     </div>
 
     <label class="filter">
-      <input type="checkbox" v-model="onlyCanceled" />
-      취소된 경기만 보기
+      <input type="checkbox" v-model="hideCanceled" />
+      취소 경기 제외
     </label>
 
-    <p v-if="shownList.length === 0" class="msg">해당하는 경기가 없습니다.</p>
+    <p v-if="shownList.length === 0" class="msg">
+      {{ hideCanceled ? '오늘 열리는 경기가 없습니다.' : '오늘 편성된 경기가 없습니다.' }}
+    </p>
 
     <div v-else class="game-list">
       <div v-for="item in shownList" :key="item.cityId" class="row">
         <div class="place">
           <p class="stadium">{{ item.stadium }}</p>
           <p class="weather">
-            {{ item.name }} · {{ item.status }} {{ item.temp }}{{ configStore.unitSymbol }}
+            <span>{{ item.name }}</span>
+            <span>{{ item.status }} {{ item.temp }}{{ configStore.unitSymbol }}</span>
           </p>
           <button @click="goDetail(item.cityId)">구장 상세</button>
         </div>
@@ -107,6 +110,9 @@ h1 {
   font-size: 30px;
 }
 .count {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
   margin: 0;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 13px;
@@ -151,6 +157,9 @@ h1 {
   font-weight: 600;
 }
 .weather {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px 10px;
   margin: 3px 0 8px 0;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 11.5px;

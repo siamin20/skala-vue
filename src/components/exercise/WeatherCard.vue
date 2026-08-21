@@ -70,7 +70,8 @@ const stubStyle = computed(() => {
 
     <div class="body">
       <p class="place">
-        {{ cityItem.name }} · {{ cityItem.stadium }}
+        <span>{{ cityItem.name }}</span>
+        <span>{{ cityItem.stadium }}</span>
         <button
           class="btn-team"
           :class="{ picked: myProfileStore.teamCityId === cityItem.id }"
@@ -89,8 +90,9 @@ const stubStyle = computed(() => {
       </p>
 
       <p class="meta">
-        습도 {{ cityItem.humidity }}% · 바람 {{ cityItem.wind }}m/s ·
-        {{ cityItem.hasGame ? '18:30 경기' : '경기 없음' }}
+        <span>습도 {{ cityItem.humidity }}%</span>
+        <span>바람 {{ cityItem.wind }}m/s</span>
+        <span>{{ cityItem.hasGame ? '18:30 경기' : '경기 없음' }}</span>
       </p>
 
       <button class="btn-detail" @click.stop="emit('click-detail', cityItem.id)">상세보기</button>
@@ -177,6 +179,9 @@ const stubStyle = computed(() => {
 }
 .place {
   display: flex;
+  align-items: baseline;
+  gap: 8px;
+  display: flex;
   align-items: center;
   gap: 4px;
   margin: 0;
@@ -219,6 +224,9 @@ const stubStyle = computed(() => {
   font-size: 24px;
 }
 .meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
   margin: 0 0 8px 0;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 11px;

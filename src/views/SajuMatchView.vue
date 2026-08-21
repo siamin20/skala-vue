@@ -13,9 +13,79 @@ const myProfileStore = useMyProfileStore()
 
 // 1. 입력한 생년월일. 스토어에 저장해 둔 값이 있으면 그걸로 시작한다.
 const birthday = ref(myProfileStore.birthday)
+
+// 화면에 치는 값은 숫자 8자리만 담는다. 하이픈은 넣지 않는다.
+const birthText = ref(myProfileStore.birthday.split('-').join(''))
+const errorMessage = ref('')
 const mySaju = ref(null)
 const isLoading = ref(false)
 const noticeMessage = ref('')
+
+// 한 자리 수는 앞에 0을 붙여 준다.
+const padZero = (value) => {
+  return value < 10 ? '0' + value : '' + value
+}
+
+// 그 달의 마지막 날. 2월은 윤년을 따진다.
+const lastDayOf = (year, month) => {
+  const table = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+  if (month === 2) {
+    const isLeap = (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0
+    return isLeap ? 29 : 28
+  }
+  return table[month - 1]
+}
+
+// 아직 안 친 자리는 Y·M·D 로 남겨 어디까지 쳤는지 보여 준다.
+const birthMask = computed(() => {
+  const slot = ['Y', 'Y', 'Y', 'Y', 'M', 'M', 'D', 'D']
+  let text = ''
+  for (let i = 0; i < 8; i++) {
+    text = text + (i < birthText.value.length ? birthText.value.charAt(i) : slot[i])
+    if (i === 3 || i === 5) {
+      text = text + '  '
+    }
+  }
+  return text
+})
+
+// 숫자만 8자리까지 받고, 다 차면 날짜가 맞는지 검사한다.
+const onBirthInput = (value) => {
+  let digits = ''
+  for (let i = 0; i < value.length; i++) {
+    const ch = value.charAt(i)
+    if (ch >= '0' && ch <= '9' && digits.length < 8) {
+      digits = digits + ch
+    }
+  }
+  birthText.value = digits
+  errorMessage.value = ''
+
+  if (digits.length < 8) {
+    return
+  }
+
+  const year = Number(digits.slice(0, 4))
+  const month = Number(digits.slice(4, 6))
+  const day = Number(digits.slice(6, 8))
+  const thisYear = new Date().getFullYear()
+
+  if (year < 1900 || year > thisYear) {
+    errorMessage.value = `연도는 1900 ~ ${thisYear} 사이로 넣어 주세요.`
+    return
+  }
+  if (month < 1 || month > 12) {
+    errorMessage.value = '월은 01 ~ 12 사이로 넣어 주세요.'
+    return
+  }
+  const last = lastDayOf(year, month)
+  if (day < 1 || day > last) {
+    errorMessage.value = `${month}월은 ${last}일까지 있습니다.`
+    return
+  }
+
+  birthday.value = `${year}-${padZero(month)}-${padZero(day)}`
+}
 
 // 2. 내 사주를 받아 온다.
 //    연주·월주는 절기 기준이라 백엔드가 만세력을 대신 조회해 준다.
@@ -32,7 +102,7 @@ const loadSaju = async (dateText) => {
   } catch (error) {
     console.warn('[사주 조회 실패] 일주만 계산해서 보여 줍니다.', error.message)
     mySaju.value = { year: '', month: '', day: iljin.hanja, iljin: iljin }
-    noticeMessage.value = '연주·월주는 서버가 있어야 볼 수 있습니다. 일주로만 비교합니다.'
+    noticeMessage.value = '연주와 월주는 서버가 있어야 볼 수 있습니다. 일주로만 비교합니다.'
   } finally {
     isLoading.value = false
   }
@@ -86,7 +156,7 @@ const matchList = computed(() => {
     }
 
     if (score > 0) {
-      scored.push({ ...player, score: score, reason: reasons.join(' · ') })
+      scored.push({ ...player, score: score, reasons: reasons })
     }
   }
 
@@ -141,19 +211,25 @@ const stadiumOf = (cityId) => {
     </div>
 
     <p class="lead">
-      생년월일로 그날의 일진(日辰)을 구해, 같은 일진을 타고난 KBO 선수를 찾아 줍니다.
+      생년월일을 숫자 여덟 자리로 넣으면 사주 네 기둥을 세워, 글자가 가장 많이 겹치는 KBO 선수를
+      찾아 줍니다.
     </p>
 
     <div class="input-row">
-      <el-date-picker
-        v-model="birthday"
-        type="date"
-        placeholder="생년월일을 고르세요"
-        value-format="YYYY-MM-DD"
-        size="large"
-      />
+      <div class="birth-box">
+        <el-input
+          :model-value="birthText"
+          size="large"
+          inputmode="numeric"
+          maxlength="8"
+          placeholder="19980312"
+          @input="onBirthInput"
+        />
+        <p class="birth-mask">{{ birthMask }}</p>
+      </div>
       <span v-if="isLoading" class="my-iljin">사주를 보는 중…</span>
     </div>
+    <p v-if="errorMessage" class="notice">{{ errorMessage }}</p>
 
     <!-- 사주 네 기둥. 태어난 시각은 받지 않아 시주 자리는 비워 둔다. -->
     <table v-if="mySaju" class="pillars">
@@ -167,16 +243,16 @@ const stadiumOf = (cityId) => {
       </thead>
       <tbody>
         <tr class="gan">
-          <td class="empty">·</td>
+          <td class="empty"></td>
           <td>{{ mySaju.day.charAt(0) }}</td>
-          <td>{{ mySaju.month ? mySaju.month.charAt(0) : '·' }}</td>
-          <td>{{ mySaju.year ? mySaju.year.charAt(0) : '·' }}</td>
+          <td :class="{ empty: !mySaju.month }">{{ mySaju.month.charAt(0) }}</td>
+          <td :class="{ empty: !mySaju.year }">{{ mySaju.year.charAt(0) }}</td>
         </tr>
         <tr class="ji">
-          <td class="empty">·</td>
+          <td class="empty"></td>
           <td>{{ mySaju.day.charAt(1) }}</td>
-          <td>{{ mySaju.month ? mySaju.month.charAt(1) : '·' }}</td>
-          <td>{{ mySaju.year ? mySaju.year.charAt(1) : '·' }}</td>
+          <td :class="{ empty: !mySaju.month }">{{ mySaju.month.charAt(1) }}</td>
+          <td :class="{ empty: !mySaju.year }">{{ mySaju.year.charAt(1) }}</td>
         </tr>
       </tbody>
     </table>
@@ -188,10 +264,19 @@ const stadiumOf = (cityId) => {
       <div v-if="bestMatch" class="best">
         <p class="best-label">사주가 가장 닮은 선수</p>
         <p class="best-name">{{ bestMatch.name }}</p>
-        <p class="best-team">{{ bestMatch.team }} · {{ bestMatch.pos }}</p>
+        <p class="best-team">
+          <span>{{ bestMatch.team }}</span>
+          <span>{{ bestMatch.pos }}</span>
+        </p>
         <el-rate :model-value="Math.min(bestMatch.score, 8)" :max="8" disabled />
-        <p class="best-saju">{{ bestMatch.year }} · {{ bestMatch.month }} · {{ bestMatch.day }}</p>
-        <p class="best-reason">{{ bestMatch.reason }}</p>
+        <p class="best-saju">
+          <span>{{ bestMatch.year }}</span>
+          <span>{{ bestMatch.month }}</span>
+          <span>{{ bestMatch.day }}</span>
+        </p>
+        <p class="best-reason">
+          <span v-for="text in bestMatch.reasons" :key="text">{{ text }}</span>
+        </p>
         <button @click="goStadium(bestMatch.cityId)">
           {{ stadiumOf(bestMatch.cityId) }} 날씨 보기
         </button>
@@ -256,6 +341,21 @@ h1 {
   color: #1a1a1a;
 }
 
+.birth-box {
+  width: 190px;
+}
+.birth-box :deep(.el-input__inner) {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 19px;
+  letter-spacing: 3px;
+}
+.birth-mask {
+  margin: 6px 0 0 0;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 3px;
+  color: #b3afa6;
+}
 .pillars {
   border-collapse: collapse;
   margin-bottom: 8px;
@@ -288,6 +388,8 @@ h1 {
   color: #b3261e;
 }
 .best-saju {
+  display: flex;
+  gap: 12px;
   margin: 0 0 10px 0;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 13px;
@@ -319,11 +421,17 @@ h1 {
   line-height: 1.1;
 }
 .best-team {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
   margin: 0 0 10px 0;
   font-size: 13.5px;
   color: #6d6a63;
 }
 .best-reason {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
   margin: 8px 0 16px 0;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 12.5px;

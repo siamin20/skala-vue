@@ -28,7 +28,20 @@ const props = defineProps({
   },
 })
 
-// 2. 상태에 따라 점수를 보여줄지 정한다 (예정·취소는 점수가 없다)
+// 2. 스코어보드 배경을 왼쪽은 원정팀 색, 오른쪽은 홈팀 색으로 이어 칠한다.
+//     가운데를 겹쳐 두면 두 색이 자연스럽게 섞인다.
+const matchStyle = computed(() => {
+  if (props.game === null) {
+    return {}
+  }
+  const away = props.game.away.color
+  const home = props.game.home.color
+  return {
+    backgroundImage: `linear-gradient(100deg, ${away} 0%, ${away} 28%, ${home} 72%, ${home} 100%)`,
+  }
+})
+
+// 3. 상태에 따라 점수를 보여줄지 정한다 (예정·취소는 점수가 없다)
 const hasScore = computed(() => {
   if (props.game === null) {
     return false
@@ -75,9 +88,9 @@ const hasScore = computed(() => {
       <span v-else class="inning">{{ game.startTime }}</span>
     </div>
 
-    <div class="match">
+    <div class="match" :style="matchStyle">
       <div class="side">
-        <span class="bar" :style="{ backgroundColor: game.away.color }"></span>
+        <span class="label">원정</span>
         <span class="team">{{ game.away.name }}</span>
       </div>
 
@@ -88,7 +101,7 @@ const hasScore = computed(() => {
 
       <div class="side right">
         <span class="team">{{ game.home.name }}</span>
-        <span class="bar" :style="{ backgroundColor: game.home.color }"></span>
+        <span class="label">홈</span>
       </div>
     </div>
 
@@ -155,30 +168,39 @@ const hasScore = computed(() => {
   align-items: center;
   justify-content: space-between;
   gap: 10px;
+  padding: 14px 14px;
+  color: #fff;
 }
 .side {
   display: flex;
-  align-items: center;
-  gap: 6px;
+  align-items: baseline;
+  gap: 7px;
   flex: 1;
   min-width: 0;
 }
 .side.right {
   justify-content: flex-end;
 }
-.bar {
-  width: 5px;
-  height: 22px;
+/* 원정·홈 표시. 팀 이름보다 한 단계 뒤로 물러나게 둔다 */
+.label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.72);
 }
 .team {
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 15px;
+  font-weight: 700;
   white-space: nowrap;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
 }
+/* 두 팀 색이 만나는 자리라 어떤 색 위에서도 읽히도록 어두운 판을 깐다 */
 .score {
+  flex-shrink: 0;
+  padding: 3px 11px;
+  border-radius: 3px;
+  background-color: rgba(0, 0, 0, 0.34);
   font-family: 'IBM Plex Mono', monospace;
   font-size: 21px;
-  white-space: nowrap;
   font-weight: 600;
   letter-spacing: -0.01em;
   white-space: nowrap;
