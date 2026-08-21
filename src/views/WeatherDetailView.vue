@@ -143,11 +143,11 @@ const goHome = () => {
       <div class="page-head">
         <div class="title-row">
           <!-- 구단 로고를 구단 색 판에 얹어 어느 구장인지 한눈에 보이게 한다 -->
-          <span class="logo-badge" :style="{ backgroundColor: stadium.color }">
+          <span class="logo-badge" :style="{ borderColor: stadium.color }">
             <img
               v-if="!logoFailed"
               class="logo"
-              :src="`/logos/${stadium.id}.png`"
+              :src="`/logos/emblem/${stadium.id}.png`"
               :alt="stadium.team"
               @error="logoFailed = true"
             />
@@ -321,17 +321,20 @@ h1 {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  width: 62px;
-  height: 62px;
-  border-radius: 10px;
+  width: 96px;
+  height: 96px;
+  border: 3px solid #1a1a1a;
+  border-radius: 12px;
+  /* 구단 엠블럼이 흰 바탕으로 만들어져 있어 판도 희게 두고 테두리로 구단색을 준다 */
+  background-color: #fff;
 }
 .logo-badge .logo {
-  width: 46px;
-  height: 46px;
+  width: 84px;
+  height: 84px;
   object-fit: contain;
 }
 .logo-badge .face {
-  font-size: 32px;
+  font-size: 46px;
 }
 .count {
   display: flex;

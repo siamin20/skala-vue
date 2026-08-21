@@ -102,7 +102,7 @@ const loadSaju = async (dateText) => {
   } catch (error) {
     console.warn('[사주 조회 실패] 일주만 계산해서 보여 줍니다.', error.message)
     mySaju.value = { year: '', month: '', day: iljin.hanja, iljin }
-    noticeMessage.value = '연주와 월주는 서버가 있어야 볼 수 있습니다. 일주로만 비교합니다.'
+    noticeMessage.value = '서버에 닿지 못해 일주로만 비교했습니다'
   } finally {
     isLoading.value = false
   }
@@ -170,6 +170,9 @@ const matchList = computed(() => {
 })
 
 // 4. 가장 많이 겹치는 선수 한 명
+// 겹치는 선수가 열 몇 명씩 나오면 눈에 안 들어와서 다섯 명까지만 보여 준다.
+const topList = computed(() => matchList.value.slice(0, 5))
+
 const bestMatch = computed(() => {
   if (matchList.value.length === 0) {
     return null
@@ -210,24 +213,20 @@ const stadiumOf = (cityId) => {
       <p class="count">선수 {{ playerList.length }}명</p>
     </div>
 
-    <p class="lead">
-      생년월일을 숫자 여덟 자리로 넣으면 사주 네 기둥을 세워, 글자가 가장 많이 겹치는 KBO 선수를
-      찾아 줍니다.
-    </p>
-
     <div class="input-row">
       <div class="birth-box">
+        <label class="birth-label">생년월일</label>
         <el-input
           :model-value="birthText"
           size="large"
           inputmode="numeric"
           maxlength="8"
-          placeholder="19980312"
+          placeholder="20001123"
           @input="onBirthInput"
         />
         <p class="birth-mask">{{ birthMask }}</p>
       </div>
-      <span v-if="isLoading" class="my-iljin">사주를 보는 중…</span>
+      <span v-if="isLoading" class="my-iljin">…</span>
     </div>
     <p v-if="errorMessage" class="notice">{{ errorMessage }}</p>
 
@@ -258,11 +257,11 @@ const stadiumOf = (cityId) => {
     </table>
     <p v-if="noticeMessage" class="notice">{{ noticeMessage }}</p>
 
-    <div v-if="mySaju === null" class="msg">생년월일을 고르면 결과가 나옵니다.</div>
+    <div v-if="mySaju === null" class="msg">생일을 넣어 주세요</div>
 
     <div v-else>
       <div v-if="bestMatch" class="best">
-        <p class="best-label">사주가 가장 닮은 선수</p>
+        <p class="best-label">가장 닮은 선수</p>
         <p class="best-name">{{ bestMatch.name }}</p>
         <p class="best-team">
           <span>{{ bestMatch.team }}</span>
@@ -282,12 +281,12 @@ const stadiumOf = (cityId) => {
         </button>
       </div>
 
-      <p v-else class="msg">겹치는 기둥이 있는 선수가 없습니다. 흔치 않은 사주네요.</p>
+      <p v-else class="msg">겹치는 선수가 없습니다</p>
 
-      <div v-if="matchList.length > 1" class="rest">
-        <h2>그 밖에 닮은 선수</h2>
+      <div v-if="topList.length > 1" class="rest">
+        <h2>다음으로 닮은 선수</h2>
         <ul>
-          <li v-for="player in matchList.slice(1)" :key="player.name">
+          <li v-for="player in topList.slice(1)" :key="player.name">
             <span class="rank-iljin">{{ player.day }}</span>
             <span class="rank-name">{{ player.name }}</span>
             <span class="rank-team">{{ player.team }}</span>
@@ -343,6 +342,13 @@ h1 {
 
 .birth-box {
   width: 190px;
+}
+.birth-label {
+  display: block;
+  margin-bottom: 5px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: #6d6a63;
 }
 .birth-box :deep(.el-input__inner) {
   font-family: 'IBM Plex Mono', monospace;
