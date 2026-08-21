@@ -5,6 +5,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { stadiumList } from '../data/stadiums.js'
 import { todayWeather } from '../data/todayWeather.js'
 import { getWeather, getAirPollution } from '../api/weatherApi.js'
+import { getShortForecast, rainRisk } from '../api/kmaApi.js'
 
 import GameScore from '../components/exercise/GameScore.vue'
 import { useConfigStore } from '../stores/configStore.js'
@@ -24,6 +25,13 @@ const game = ref(null)
 const air = ref(null)
 const isLoading = ref(false)
 const errorMessage = ref('')
+
+// public/logos/{id}.png 가 없으면 이모지를 대신 보여 준다.
+const logoFailed = ref(false)
+
+// 기상청 초단기예보 (앞으로 6시간)
+const forecast = ref([])
+const forecastFailed = ref(false)
 
 // 2. 주소창의 /weather/:cityId 값을 읽어서 화면이 붙는 시점에 데이터를 고른다
 onMounted(async () => {
@@ -74,6 +82,22 @@ onMounted(async () => {
   } finally {
     isLoading.value = false
   }
+
+  // 기상청 예보는 따로 받는다. 이게 실패해도 위 정보는 그대로 보여야 한다.
+  try {
+    forecast.value = await getShortForecast(stadium.value.nx, stadium.value.ny)
+  } catch (error) {
+    forecastFailed.value = true
+    console.error('[기상청 예보 실패]', error)
+  }
+})
+
+// 3. 경기 시각에 비가 오는지 한 줄로 정리한다. 돔구장은 비와 상관없다.
+const rainLine = computed(() => {
+  if (stadium.value === null || stadium.value.isDome) {
+    return null
+  }
+  return rainRisk(forecast.value, game.value ? game.value.startTime : '')
 })
 
 // [추가] 대기질 등급(1~5)을 우리말로 바꾼다
@@ -114,33 +138,6 @@ const displayTemp = computed(() => {
   return rawTemp
 })
 
-// 4. 날씨를 보고 직관 준비물을 골라 준다 (직접 추가한 computed)
-const packingList = computed(() => {
-  const items = []
-  if (weather.value === null || weather.value === undefined) {
-    return items
-  }
-  if (weather.value.status === '비') {
-    items.push('🧥 우비 (구장은 우산 반입이 안 됩니다)')
-  }
-  if (weather.value.status === '맑음') {
-    items.push('🧴 선크림')
-  }
-  if (weather.value.temp >= 28) {
-    items.push('🧊 얼음물')
-  }
-  if (weather.value.temp <= 25) {
-    items.push('🧣 담요 (야간 경기는 쌀쌀합니다)')
-  }
-  if (weather.value.wind >= 6) {
-    items.push('🧢 모자보다 후드')
-  }
-  if (air.value !== null && air.value.main.aqi >= 3) {
-    items.push('😷 마스크 (미세먼지 ' + airGrade.value + ')')
-  }
-  return items
-})
-
 const goHome = () => {
   router.push('/')
 }
@@ -157,19 +154,60 @@ const goHome = () => {
 
     <div v-else>
       <div class="page-head">
-        <h1>{{ stadium.emoji }} {{ stadium.stadium }}</h1>
-        <p class="count">{{ stadium.name }} · {{ stadium.team }}</p>
+        <div class="title-row">
+          <!-- 구단 로고를 구단 색 판에 얹어 어느 구장인지 한눈에 보이게 한다 -->
+          <span class="logo-badge" :style="{ backgroundColor: stadium.color }">
+            <img
+              v-if="!logoFailed"
+              class="logo"
+              :src="`/logos/${stadium.id}.png`"
+              :alt="stadium.team"
+              @error="logoFailed = true"
+            />
+            <span v-else class="face">{{ stadium.emoji }}</span>
+          </span>
+          <div>
+            <h1>{{ stadium.stadium }}</h1>
+            <p class="count">
+              <span>{{ stadium.name }}</span>
+              <span>{{ stadium.team }}</span>
+            </p>
+          </div>
+        </div>
       </div>
 
       <p class="temp">
         {{ displayTemp }}<span class="unit">{{ configStore.unitSymbol }}</span>
       </p>
       <p class="meta">
-        {{ weather.status }} · 습도 {{ weather.humidity }}% · 바람 {{ weather.wind }}m/s ·
-        {{ weather.hasGame ? '18:30 경기' : '오늘 경기 없음' }}
+        <span>{{ weather.status }}</span>
+        <span>습도 {{ weather.humidity }}%</span>
+        <span>바람 {{ weather.wind }}m/s</span>
+        <span>{{ weather.hasGame ? '18:30 경기' : '오늘 경기 없음' }}</span>
       </p>
 
       <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
+
+      <!-- 기상청 초단기예보. 발표 시각부터 6시간 앞까지 1시간 간격으로 온다.
+           돔구장은 비와 무관하므로 아예 띄우지 않는다. -->
+      <template v-if="!stadium.isDome">
+        <h2>비 예보</h2>
+        <p v-if="forecastFailed" class="msg-small">기상청 예보를 불러오지 못했습니다.</p>
+        <p v-else-if="forecast.length === 0" class="msg-small">불러오는 중</p>
+        <div v-else>
+          <p class="rain-line" :class="rainLine.level">{{ rainLine.text }}</p>
+
+          <ul class="hours">
+            <li v-for="slot in forecast" :key="slot.time" :class="{ wet: slot.rainType !== '' }">
+              <span class="hour">{{ slot.time.slice(0, 2) }}시</span>
+              <span class="what">{{ slot.rainType === '' ? '—' : slot.rainType }}</span>
+              <span class="mm">{{ slot.rain === 0 ? '' : slot.rain + 'mm' }}</span>
+            </li>
+          </ul>
+
+          <p class="credit">자료 제공 기상청</p>
+        </div>
+      </template>
 
       <h2>대기질</h2>
       <div v-if="air !== null">
@@ -191,12 +229,6 @@ const goHome = () => {
 
       <h2 class="gap">오늘 경기</h2>
       <GameScore :game="game" />
-
-      <h2 class="gap">준비물</h2>
-      <ul v-if="packingList.length > 0">
-        <li v-for="(item, index) in packingList" :key="index">{{ item }}</li>
-      </ul>
-      <p v-else class="msg">특별히 챙길 것은 없습니다.</p>
 
       <h2>구장</h2>
       <dl>
@@ -222,12 +254,102 @@ const goHome = () => {
   margin-bottom: 22px;
   border-bottom: 2px solid #1a1a1a;
 }
+/* 비 예보 */
+.msg-small {
+  margin: 0 0 6px 0;
+  font-size: 13.5px;
+  color: #6d6a63;
+}
+.rain-line {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+.rain-line.none {
+  color: #1a7f43;
+}
+.rain-line.low {
+  color: #a86a00;
+}
+.rain-line.high {
+  color: #b3261e;
+}
+.hours {
+  display: flex;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-x: auto;
+}
+.hours li {
+  flex: 1 0 62px;
+  padding: 8px 4px;
+  border: 1px solid #dedbd4;
+  text-align: center;
+  background-color: #fbfaf7;
+}
+.hours li.wet {
+  border-color: #1a1a1a;
+  background-color: #eef3fa;
+}
+.hours .hour {
+  display: block;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: #6d6a63;
+}
+.hours .what {
+  display: block;
+  margin-top: 3px;
+  font-size: 13px;
+}
+.hours .mm {
+  display: block;
+  min-height: 14px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: #b3261e;
+}
+/* 공공데이터 이용허락범위가 "저작자 표시"라 출처를 반드시 밝힌다 */
+.credit {
+  margin: 8px 0 0 0;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: #b3afa6;
+}
+
 h1 {
   margin: 0;
   font-family: 'Black Han Sans', sans-serif;
   font-size: 28px;
 }
+.title-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.logo-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 62px;
+  height: 62px;
+  border-radius: 10px;
+}
+.logo-badge .logo {
+  width: 46px;
+  height: 46px;
+  object-fit: contain;
+}
+.logo-badge .face {
+  font-size: 32px;
+}
 .count {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
   margin: 0;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 13px;
@@ -250,6 +372,9 @@ h1 {
   color: #6d6a63;
 }
 .meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
   margin: 8px 0 30px 0;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 12.5px;
