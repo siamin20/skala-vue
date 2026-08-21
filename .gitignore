@@ -38,3 +38,6 @@ __screenshots__/
 # Vite
 *.timestamp-*-*.mjs
 dist
+
+# 작업용 메모 — 제출물이 아니므로 올리지 않는다
+.local/
