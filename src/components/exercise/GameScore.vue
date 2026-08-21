@@ -118,13 +118,14 @@ const hasScore = computed(() => {
 /* 한 줄 버전 — 테두리 없이 카드 안에 얹는다 */
 .line {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 5px;
+  gap: 4px 5px;
   margin: 0;
+  min-width: 0;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 11.5px;
   color: #1a1a1a;
-  white-space: nowrap;
 }
 .line .bar {
   width: 3px;
@@ -133,6 +134,11 @@ const hasScore = computed(() => {
 .tail {
   margin-left: auto;
   color: #6d6a63;
+}
+/* 카드 폭이 좁을 때 팀 이름이 줄바꿈되도록 둔다 */
+.line > span,
+.line {
+  overflow-wrap: anywhere;
 }
 
 .board {

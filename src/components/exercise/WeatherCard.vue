@@ -109,6 +109,7 @@ const stubStyle = computed(() => {
 /* 가로형 입장권: 왼쪽 스터브(구단) - 절취선 - 오른쪽 본권(날씨) */
 .ticket {
   display: flex;
+  min-width: 0;
   background-color: #fbfaf7;
   border: 1px solid #1a1a1a;
   cursor: pointer;
@@ -177,15 +178,19 @@ const stubStyle = computed(() => {
   color: rgba(255, 255, 255, 0.88);
 }
 
+/* flex 자식은 min-width 가 auto 라 안쪽 내용보다 좁아지지 않는다.
+   0 으로 낮춰야 긴 경기 정보가 카드를 뚫고 나가지 않는다. */
 .body {
   position: relative;
   flex: 1;
+  min-width: 0;
   padding: 11px 13px 10px 14px;
 }
 .place {
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
-  gap: 8px;
+  gap: 3px 8px;
   display: flex;
   align-items: center;
   gap: 4px;
@@ -253,6 +258,7 @@ const stubStyle = computed(() => {
 }
 
 .opened-box {
+  min-width: 0;
   padding: 8px 0 10px 0;
   margin-bottom: 8px;
   border-top: 1px dashed #cfccc4;

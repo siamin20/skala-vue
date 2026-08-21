@@ -224,7 +224,7 @@ const goHome = () => {
         <dt>좌석</dt>
         <dd>{{ stadium.seats }}석</dd>
         <dt>지붕</dt>
-        <dd>{{ stadium.isDome ? '돔구장 (비가 와도 경기함)' : '없음' }}</dd>
+        <dd>{{ stadium.isDome ? '돔' : '없음' }}</dd>
       </dl>
 
       <button @click="goHome">구장 목록으로</button>
@@ -387,9 +387,15 @@ li {
   border-bottom: 1px solid #cfccc4;
   font-size: 14px;
 }
+/* 이름과 값을 위아래로 쌓으면 줄 간격이 들쭉날쭉해 보인다.
+   두 칸으로 나란히 놓고 줄마다 같은 간격을 준다. */
 dl {
+  display: grid;
+  grid-template-columns: 76px 1fr;
+  align-items: baseline;
   margin: 0 0 30px 0;
   font-size: 14px;
+  line-height: 1.5;
 }
 .air-grade {
   margin: 8px 0 14px 0;
@@ -402,12 +408,21 @@ dl {
   border-radius: 0;
 }
 dt {
+  padding: 9px 0 8px 0;
+  border-top: 1px solid #e6e3dc;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 11.5px;
   color: #6d6a63;
 }
 dd {
-  margin: 2px 0 12px 0;
+  margin: 0;
+  padding: 8px 0;
+  border-top: 1px solid #e6e3dc;
+}
+/* 첫 줄 위에는 h2 밑줄이 이미 있어 겹치지 않게 뗀다 */
+dl dt:first-of-type,
+dl dt:first-of-type + dd {
+  border-top: none;
 }
 .gap {
   margin-top: 30px;
