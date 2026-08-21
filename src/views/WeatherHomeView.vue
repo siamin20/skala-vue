@@ -5,9 +5,8 @@ import { useRouter } from 'vue-router'
 import { stadiumList } from '../data/stadiums.js'
 import { todayWeather } from '../data/todayWeather.js'
 import { getWeather } from '../api/weatherApi.js'
-import { getTodayGames } from '../api/kboApi.js'
-import { todayGames } from '../data/todayGames.js'
 import { useMyProfileStore } from '../stores/myProfileStore.js'
+import { useGameStore } from '../stores/gameStore.js'
 import BaseDashboardCard from '../components/exercise/BaseDashboardCard.vue'
 import SearchBar from '../components/exercise/SearchBar.vue'
 import WeatherCard from '../components/exercise/WeatherCard.vue'
@@ -15,16 +14,13 @@ import GameScore from '../components/exercise/GameScore.vue'
 
 const router = useRouter()
 const myProfileStore = useMyProfileStore()
+const gameStore = useGameStore()
 
 // 1. 반응형 상태
 //    처음에는 목업으로 화면을 그리고, 마운트된 뒤 실제 날씨로 덮어쓴다.
 const weatherList = ref(todayWeather)
 const isLoading = ref(false)
 const errorMessage = ref('')
-
-// 오늘 경기. 백엔드가 없으면 목업을 그대로 쓴다.
-const gameList = ref(todayGames)
-const gameSource = ref('목업')
 
 // 2. 화면이 붙는 시점에 9개 구장 날씨를 불러온다.
 //    한 도시가 실패해도 나머지는 보여 줘야 하므로 하나씩 순서대로 받는다.
@@ -57,22 +53,19 @@ onMounted(async () => {
     console.error('[날씨 조회 실패]', error)
   }
 
-  // 경기 정보는 직접 만든 백엔드에서 받는다. 배포본에는 서버가 없으므로 실패해도 넘어간다.
-  try {
-    const games = await getTodayGames()
-    gameList.value = games
-    gameSource.value = 'KBO 실시간'
+  // 경기 정보는 스토어가 실시간 -> 저장됨 -> 목업 순으로 알아서 물러선다.
+  await gameStore.loadGames()
 
-    // 실제 경기 일정에 맞춰 각 구장의 경기 유무를 다시 맞춘다.
-    // 가져온 목업 배열을 직접 고치면 원본이 바뀌므로 새 배열을 만든다.
-    const updated = []
-    for (const item of weatherList.value) {
-      updated.push({ ...item, hasGame: games.some((game) => game.cityId === item.id) })
-    }
-    weatherList.value = updated
-  } catch (error) {
-    console.warn('[KBO 백엔드 없음] 목업 경기 정보를 사용합니다.', error.message)
+  // 받아 온 일정에 맞춰 각 구장의 경기 유무를 다시 맞춘다.
+  // 원본 배열을 직접 고치면 다른 화면에도 영향이 가므로 새 배열을 만든다.
+  const updated = []
+  for (const item of weatherList.value) {
+    updated.push({
+      ...item,
+      hasGame: gameStore.games.some((game) => game.cityId === item.id),
+    })
   }
+  weatherList.value = updated
 
   isLoading.value = false
 })
@@ -168,16 +161,7 @@ const selectCard = (cityId) => {
   }
 }
 
-// 9. 펼친 카드에 보여 줄 오늘 경기. 없으면 null 을 넘긴다.
-const findGame = (cityId) => {
-  const found = gameList.value.find((item) => item.cityId === cityId)
-  if (found === undefined) {
-    return null
-  }
-  return found
-}
-
-// 10. 상세보기를 누르면 알림창 대신 상세 페이지로 이동한다
+// 9. 상세보기를 누르면 알림창 대신 상세 페이지로 이동한다
 const goDetail = (cityId) => {
   router.push(`/weather/${cityId}`)
 }
@@ -215,7 +199,7 @@ const goDetail = (cityId) => {
           @select-card="selectCard"
           @click-detail="goDetail"
         >
-          <GameScore :game="findGame(item.id)" compact />
+          <GameScore :game="gameStore.findGame(item.id)" compact />
         </WeatherCard>
       </div>
     </BaseDashboardCard>

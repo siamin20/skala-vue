@@ -4,34 +4,25 @@ import { useRouter } from 'vue-router'
 
 import { stadiumList } from '../data/stadiums.js'
 import { todayWeather } from '../data/todayWeather.js'
-import { todayGames } from '../data/todayGames.js'
-import { getTodayGames } from '../api/kboApi.js'
+import { useGameStore } from '../stores/gameStore.js'
 import GameScore from '../components/exercise/GameScore.vue'
 import { useConfigStore } from '../stores/configStore.js'
 
 const configStore = useConfigStore()
+const gameStore = useGameStore()
 
 const router = useRouter()
 
 // 1. 취소된 경기만 골라 보는 스위치
 const onlyCanceled = ref(false)
 
-// 오늘 경기. 백엔드가 없으면 목업으로 보여 준다.
-const games = ref(todayGames)
-const gameSource = ref('목업')
-
 onMounted(async () => {
-  try {
-    games.value = await getTodayGames()
-    gameSource.value = 'KBO 실시간'
-  } catch (error) {
-    console.warn('[KBO 백엔드 없음] 목업 경기 정보를 사용합니다.', error.message)
-  }
+  await gameStore.loadGames()
 })
 
 // 2. 경기에 구장 이름과 그 구장 날씨를 붙인다
 const gameList = computed(() => {
-  return games.value.map((game) => {
+  return gameStore.games.map((game) => {
     const stadium = stadiumList.find((item) => item.id === game.cityId)
     const weather = todayWeather.find((item) => item.id === game.cityId)
     return {

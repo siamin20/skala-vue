@@ -5,12 +5,13 @@ import { useRoute, useRouter } from 'vue-router'
 import { stadiumList } from '../data/stadiums.js'
 import { todayWeather } from '../data/todayWeather.js'
 import { getWeather, getAirPollution } from '../api/weatherApi.js'
-import { getTodayGames } from '../api/kboApi.js'
-import { todayGames } from '../data/todayGames.js'
+
 import GameScore from '../components/exercise/GameScore.vue'
 import { useConfigStore } from '../stores/configStore.js'
+import { useGameStore } from '../stores/gameStore.js'
 
 const configStore = useConfigStore()
+const gameStore = useGameStore()
 
 const route = useRoute()
 const router = useRouter()
@@ -33,8 +34,7 @@ onMounted(async () => {
   weather.value = weatherList.value.find((item) => item.id === cityId)
 
   // 오늘 이 구장 경기. 없으면 undefined 가 되므로 null 로 맞춰 둔다.
-  const found = todayGames.find((item) => item.cityId === cityId)
-  game.value = found === undefined ? null : found
+  game.value = gameStore.findGame(cityId)
 
   if (
     stadium.value === undefined ||
@@ -65,14 +65,9 @@ onMounted(async () => {
     const airData = await getAirPollution(data.coord.lat, data.coord.lon)
     air.value = airData.list[0]
 
-    // 오늘 경기도 백엔드에서 받아 온다. 없으면 위에서 넣어 둔 목업이 그대로 남는다.
-    try {
-      const games = await getTodayGames()
-      const realGame = games.find((item) => item.cityId === cityId)
-      game.value = realGame === undefined ? null : realGame
-    } catch (kboError) {
-      console.warn('[KBO 백엔드 없음] 목업 경기 정보를 사용합니다.', kboError.message)
-    }
+    // 경기 정보는 스토어가 실시간 -> 저장됨 -> 목업 순으로 알아서 물러선다.
+    await gameStore.loadGames()
+    game.value = gameStore.findGame(cityId)
   } catch (error) {
     errorMessage.value = '실시간 정보를 불러오지 못했습니다.'
     console.error('[상세 조회 실패]', error)
