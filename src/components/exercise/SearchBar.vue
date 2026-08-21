@@ -21,9 +21,14 @@ defineProps({
 const emit = defineEmits(['update-query'])
 
 // el-input 은 값이 바뀌면 새 값을 그대로 넘겨준다.
-// 한글을 조합하는 중에도 넘어오므로 한 글자씩 검색된다.
 const changeKeyword = (value) => {
   emit('update-query', value)
+}
+
+// 한글은 조합이 끝나야 값이 넘어온다. '대구' 를 치고 멈추면 '구' 가 조합 중이라
+// 검색어는 '대' 에 머물러 화면과 어긋난다. 조합 중에도 지금 글자를 받아서 맞춰 준다.
+const changeComposing = (event) => {
+  emit('update-query', event.target.value)
 }
 </script>
 
@@ -36,13 +41,12 @@ const changeKeyword = (value) => {
       clearable
       :prefix-icon="Search"
       @update:model-value="changeKeyword"
+      @compositionupdate="changeComposing"
     />
 
-    <p v-if="keyword.trim() === ''" class="guide">
-      전체 {{ totalCount }}개 구장을 보여 주는 중입니다.
-    </p>
-    <p v-else-if="resultCount > 0" class="guide">'{{ keyword }}' 검색 결과 {{ resultCount }}곳</p>
-    <p v-else class="guide empty">검색어와 일치하는 도시가 없습니다.</p>
+    <p v-if="keyword.trim() === ''" class="guide">구장 {{ totalCount }}곳</p>
+    <p v-else-if="resultCount > 0" class="guide">{{ resultCount }}곳 / {{ totalCount }}곳</p>
+    <p v-else class="guide empty">일치하는 도시 없음</p>
   </div>
 </template>
 

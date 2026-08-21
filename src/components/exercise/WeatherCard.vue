@@ -123,8 +123,13 @@ const stubStyle = computed(() => {
   background-color: #fff;
   box-shadow: 4px 4px 0 #1a1a1a;
 }
-.no-game {
+/* 경기 없는 구장은 뒤로 물리되, 어느 구단인지는 알아볼 수 있어야 하므로
+   로고가 있는 스터브는 덜 흐리게 둔다 */
+.no-game .body {
   opacity: 0.45;
+}
+.no-game .stub {
+  opacity: 0.72;
 }
 
 .stub {
