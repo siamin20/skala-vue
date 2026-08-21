@@ -44,33 +44,29 @@ onMounted(async () => {
   // 오늘 이 구장 경기. 없으면 undefined 가 되므로 null 로 맞춰 둔다.
   game.value = gameStore.findGame(cityId)
 
-  if (
-    stadium.value === undefined ||
-    stadium.value === null ||
-    weather.value === undefined ||
-    weather.value === null
-  ) {
+  // == null 은 null 과 undefined 를 한 번에 걸러 준다
+  if (stadium.value == null || weather.value == null) {
     return
   }
 
   // 실제 날씨와 대기오염을 불러온다. 대기오염은 위도·경도가 필요해서 날씨를 먼저 받는다.
   isLoading.value = true
   try {
-    const data = await getWeather(stadium.value.query)
+    const { main, weather: sky, wind, coord } = await getWeather(stadium.value.query)
     weather.value = {
       id: cityId,
-      temp: Math.round(data.main.temp),
-      feelsLike: Math.round(data.main.feels_like),
-      tempMin: Math.round(data.main.temp_min),
-      tempMax: Math.round(data.main.temp_max),
-      status: data.weather[0].description,
-      sky: data.weather[0].main,
-      humidity: data.main.humidity,
-      wind: Math.round(data.wind.speed),
+      temp: Math.round(main.temp),
+      feelsLike: Math.round(main.feels_like),
+      tempMin: Math.round(main.temp_min),
+      tempMax: Math.round(main.temp_max),
+      status: sky[0].description,
+      sky: sky[0].main,
+      humidity: main.humidity,
+      wind: Math.round(wind.speed),
       hasGame: weather.value.hasGame,
     }
 
-    const airData = await getAirPollution(data.coord.lat, data.coord.lon)
+    const airData = await getAirPollution(coord.lat, coord.lon)
     air.value = airData.list[0]
 
     // 경기 정보는 스토어가 실시간 -> 저장됨 -> 목업 순으로 알아서 물러선다.
@@ -94,44 +90,35 @@ onMounted(async () => {
 
 // 3. 경기 시각에 비가 오는지 한 줄로 정리한다. 돔구장은 비와 상관없다.
 const rainLine = computed(() => {
-  if (stadium.value === null || stadium.value.isDome) {
+  if (stadium.value == null || stadium.value.isDome) {
     return null
   }
-  return rainRisk(forecast.value, game.value ? game.value.startTime : '')
+  return rainRisk(forecast.value, game.value?.startTime ?? '')
 })
 
 // [추가] 대기질 등급(1~5)을 우리말로 바꾼다
 const airGrade = computed(() => {
-  if (air.value === null) {
-    return ''
-  }
   const table = ['', '좋음', '보통', '나쁨', '매우 나쁨', '최악']
-  return table[air.value.main.aqi]
+  return table[air.value?.main.aqi] ?? ''
 })
 
 // [추가] 등급을 막대 길이(0~100)로 바꾼다
 const airPercent = computed(() => {
-  if (air.value === null) {
-    return 0
-  }
-  return air.value.main.aqi * 20
+  return (air.value?.main.aqi ?? 0) * 20
 })
 
 // [추가] 등급이 나쁠수록 붉게
 const airColor = computed(() => {
-  if (air.value === null) {
-    return '#9b978e'
-  }
   const table = ['', '#3d7a4f', '#7aa63d', '#d99a2b', '#d4622b', '#b3261e']
-  return table[air.value.main.aqi]
+  return table[air.value?.main.aqi] ?? '#9b978e'
 })
 
 // 3. 설정된 단위에 맞춘 온도
 const displayTemp = computed(() => {
-  if (weather.value === null || weather.value === undefined) {
+  const rawTemp = weather.value?.temp
+  if (rawTemp == null) {
     return 0
   }
-  const rawTemp = weather.value.temp
   if (configStore.unit === 'fahrenheit') {
     return Math.round((rawTemp * 9) / 5 + 32)
   }
@@ -146,7 +133,7 @@ const goHome = () => {
 <template>
   <div>
     <!-- 주소를 직접 고쳐 없는 구장으로 들어오는 경우를 막는다 -->
-    <div v-if="stadium === null || stadium === undefined">
+    <div v-if="stadium == null">
       <div class="page-head"><h1>구장 없음</h1></div>
       <p class="msg">주소에 적힌 구장 번호가 올바르지 않습니다.</p>
       <button @click="goHome">구장 목록으로</button>

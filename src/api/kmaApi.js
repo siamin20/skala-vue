@@ -23,31 +23,19 @@ const baseTimeOf = (now) => {
   }
   const date = `${moment.getFullYear()}${pad(moment.getMonth() + 1)}${pad(moment.getDate())}`
   const time = `${pad(moment.getHours())}30`
-  return { date: date, time: time }
+  return { date, time }
 }
 
 // 3. 강수형태 코드를 사람이 읽는 말로 바꾼다.
-const rainTypeText = (code) => {
-  if (code === '1') {
-    return '비'
-  }
-  if (code === '2') {
-    return '비/눈'
-  }
-  if (code === '3') {
-    return '눈'
-  }
-  if (code === '5') {
-    return '빗방울'
-  }
-  if (code === '6') {
-    return '빗방울눈날림'
-  }
-  if (code === '7') {
-    return '눈날림'
-  }
-  return ''
+const RAIN_TYPE = {
+  1: '비',
+  2: '비/눈',
+  3: '눈',
+  5: '빗방울',
+  6: '빗방울눈날림',
+  7: '눈날림',
 }
+const rainTypeText = (code) => RAIN_TYPE[code] ?? ''
 
 // 4. 강수량은 '1mm 미만', '30.0~50.0mm' 같은 범주 문자열로도 온다.
 //    비교할 수 있게 대표 숫자를 뽑아 준다.
@@ -73,40 +61,41 @@ export const getShortForecast = async (nx, ny) => {
     `&base_date=${base.date}&base_time=${base.time}&nx=${nx}&ny=${ny}`
 
   const response = await axios.get(url, { timeout: 10000 })
-  const header = response.data.response.header
-  if (header.resultCode !== '00') {
-    throw new Error(`기상청 응답 오류: ${header.resultMsg}`)
+  const { resultCode, resultMsg } = response.data.response.header
+  if (resultCode !== '00') {
+    throw new Error(`기상청 응답 오류: ${resultMsg}`)
   }
 
   // 같은 시각끼리 묶는다. 한 시각에 항목이 열 개씩 따로 온다.
   const items = response.data.response.body.items.item
   const byTime = {}
-  const order = []
-  for (const item of items) {
-    if (!byTime[item.fcstTime]) {
-      byTime[item.fcstTime] = { time: item.fcstTime, rainType: '', rain: 0, sky: '', lightning: 0 }
-      order.push(item.fcstTime)
+  for (const { fcstTime, category, fcstValue } of items) {
+    const slot = byTime[fcstTime] ?? {
+      time: fcstTime,
+      rainType: '',
+      rain: 0,
+      sky: '',
+      lightning: 0,
     }
-    const slot = byTime[item.fcstTime]
-    if (item.category === 'PTY') {
-      slot.rainType = rainTypeText(item.fcstValue)
+    if (category === 'PTY') {
+      slot.rainType = rainTypeText(fcstValue)
     }
-    if (item.category === 'RN1') {
-      slot.rain = rainAmount(item.fcstValue)
+    if (category === 'RN1') {
+      slot.rain = rainAmount(fcstValue)
     }
-    if (item.category === 'SKY') {
-      slot.sky = item.fcstValue
+    if (category === 'SKY') {
+      slot.sky = fcstValue
     }
-    if (item.category === 'LGT') {
-      slot.lightning = Number(item.fcstValue)
+    if (category === 'LGT') {
+      slot.lightning = Number(fcstValue)
     }
+    byTime[fcstTime] = slot
   }
 
-  const list = []
-  for (const time of order) {
-    list.push(byTime[time])
-  }
-  return list
+  // 시각 순으로 세워서 돌려준다
+  return Object.entries(byTime)
+    .sort(([a], [b]) => (a > b ? 1 : -1))
+    .map(([, slot]) => slot)
 }
 
 // 6. 경기 시각에 비가 오는지 한 줄로 판정한다.
@@ -118,24 +107,15 @@ export const rainRisk = (forecast, startTime) => {
   }
 
   // 경기 시작 시각(예: '18:30')이 예보 범위 안에 있으면 그 시각부터, 없으면 전체를 본다.
-  const startHour = startTime ? startTime.split(':')[0] + '00' : ''
-  let from = 0
-  for (let i = 0; i < forecast.length; i++) {
-    if (forecast[i].time === startHour) {
-      from = i
-    }
-  }
+  const startHour = startTime ? `${startTime.split(':')[0]}00` : ''
+  const found = forecast.findIndex((slot) => slot.time === startHour)
+  const from = found === -1 ? 0 : found
 
-  let worst = null
-  for (let i = from; i < forecast.length; i++) {
-    const slot = forecast[i]
-    if (slot.rainType === '') {
-      continue
-    }
-    if (worst === null || slot.rain > worst.rain) {
-      worst = slot
-    }
-  }
+  // 그중 가장 많이 오는 시간대를 고른다
+  const worst = forecast
+    .slice(from)
+    .filter((slot) => slot.rainType !== '')
+    .reduce((most, slot) => (most === null || slot.rain > most.rain ? slot : most), null)
 
   if (worst === null) {
     return { level: 'none', text: '예보상 비 없음' }

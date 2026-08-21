@@ -22,7 +22,7 @@ const STADIUM_TO_CITY = {
 // 연주·월주는 절기 기준이라 날짜 계산으로 구할 수 없어 백엔드가 만세력을 대신 조회해 준다.
 export const getSaju = async (year, month, day) => {
   const response = await axios.get(`${BASE_URL}/api/saju`, {
-    params: { year: year, month: month, day: day },
+    params: { year, month, day },
     timeout: 45000,
   })
   return response.data
@@ -38,7 +38,7 @@ export const getTodayGames = async () => {
   for (const game of response.data) {
     const cityId = STADIUM_TO_CITY[game.stadium]
     if (cityId) {
-      games.push({ ...game, cityId: cityId })
+      games.push({ ...game, cityId })
     }
   }
   return games

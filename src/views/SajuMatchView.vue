@@ -97,11 +97,11 @@ const loadSaju = async (dateText) => {
   isLoading.value = true
   noticeMessage.value = ''
   try {
-    const data = await getSaju(Number(parts[0]), Number(parts[1]), Number(parts[2]))
-    mySaju.value = { year: data.year, month: data.month, day: data.day, iljin: iljin }
+    const { year, month, day } = await getSaju(...parts.map(Number))
+    mySaju.value = { year, month, day, iljin }
   } catch (error) {
     console.warn('[사주 조회 실패] 일주만 계산해서 보여 줍니다.', error.message)
-    mySaju.value = { year: '', month: '', day: iljin.hanja, iljin: iljin }
+    mySaju.value = { year: '', month: '', day: iljin.hanja, iljin }
     noticeMessage.value = '연주와 월주는 서버가 있어야 볼 수 있습니다. 일주로만 비교합니다.'
   } finally {
     isLoading.value = false
@@ -156,7 +156,7 @@ const matchList = computed(() => {
     }
 
     if (score > 0) {
-      scored.push({ ...player, score: score, reasons: reasons })
+      scored.push({ ...player, score, reasons })
     }
   }
 
