@@ -90,6 +90,23 @@ const airGrade = computed(() => {
   return table[air.value.main.aqi]
 })
 
+// [추가] 등급을 막대 길이(0~100)로 바꾼다
+const airPercent = computed(() => {
+  if (air.value === null) {
+    return 0
+  }
+  return air.value.main.aqi * 20
+})
+
+// [추가] 등급이 나쁠수록 붉게
+const airColor = computed(() => {
+  if (air.value === null) {
+    return '#9b978e'
+  }
+  const table = ['', '#3d7a4f', '#7aa63d', '#d99a2b', '#d4622b', '#b3261e']
+  return table[air.value.main.aqi]
+})
+
 // 3. 설정된 단위에 맞춘 온도
 const displayTemp = computed(() => {
   if (weather.value === null || weather.value === undefined) {
@@ -160,14 +177,21 @@ const goHome = () => {
       <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
 
       <h2>대기질</h2>
-      <dl v-if="air !== null">
-        <dt>통합 등급</dt>
-        <dd>{{ airGrade }}</dd>
-        <dt>미세먼지 PM10</dt>
-        <dd>{{ air.components.pm10 }} ㎍/㎥</dd>
-        <dt>초미세먼지 PM2.5</dt>
-        <dd>{{ air.components.pm2_5 }} ㎍/㎥</dd>
-      </dl>
+      <div v-if="air !== null">
+        <el-progress
+          :percentage="airPercent"
+          :color="airColor"
+          :stroke-width="18"
+          :show-text="false"
+        />
+        <p class="air-grade" :style="{ color: airColor }">{{ airGrade }}</p>
+        <dl>
+          <dt>미세먼지 PM10</dt>
+          <dd>{{ air.components.pm10 }} ㎍/㎥</dd>
+          <dt>초미세먼지 PM2.5</dt>
+          <dd>{{ air.components.pm2_5 }} ㎍/㎥</dd>
+        </dl>
+      </div>
       <p v-else class="msg">{{ isLoading ? '불러오는 중…' : '대기질 정보가 없습니다.' }}</p>
 
       <h2 class="gap">오늘 경기</h2>
@@ -256,6 +280,16 @@ li {
 dl {
   margin: 0 0 30px 0;
   font-size: 14px;
+}
+.air-grade {
+  margin: 8px 0 14px 0;
+  font-size: 17px;
+  font-weight: 600;
+}
+/* Element Plus 막대 모서리를 이 화면 톤에 맞춘다 */
+:deep(.el-progress-bar__outer),
+:deep(.el-progress-bar__inner) {
+  border-radius: 0;
 }
 dt {
   font-family: 'IBM Plex Mono', monospace;

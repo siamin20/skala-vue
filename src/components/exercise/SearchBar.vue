@@ -1,4 +1,6 @@
 <script setup>
+import { Search } from '@element-plus/icons-vue'
+
 // 1. 부모가 가진 검색어를 받아서 보여 준다 (읽기 전용)
 defineProps({
   keyword: {
@@ -18,20 +20,22 @@ defineProps({
 // 2. 입력이 바뀌면 부모에게 올려 보낸다
 const emit = defineEmits(['update-query'])
 
-// v-model 은 한글을 조합하는 중에는 값이 안 넘어간다.
-// :value 와 @input 으로 풀어 쓰면 한 글자씩 검색된다.
-const changeKeyword = (event) => {
-  emit('update-query', event.target.value)
+// el-input 은 값이 바뀌면 새 값을 그대로 넘겨준다.
+// 한글을 조합하는 중에도 넘어오므로 한 글자씩 검색된다.
+const changeKeyword = (value) => {
+  emit('update-query', value)
 }
 </script>
 
 <template>
   <div>
-    <input
-      type="text"
-      :value="keyword"
-      @input="changeKeyword"
+    <el-input
+      :model-value="keyword"
       placeholder="도시 이름 (예: 서울, 대구)"
+      size="large"
+      clearable
+      :prefix-icon="Search"
+      @update:model-value="changeKeyword"
     />
 
     <p v-if="keyword.trim() === ''" class="guide">
@@ -43,19 +47,6 @@ const changeKeyword = (event) => {
 </template>
 
 <style scoped>
-input {
-  width: 100%;
-  padding: 9px 12px;
-  background-color: #fff;
-  border: 1px solid #9b978e;
-  font-family: 'IBM Plex Sans KR', sans-serif;
-  font-size: 14px;
-  color: #1a1a1a;
-  outline: none;
-}
-input:focus {
-  border-color: #1a1a1a;
-}
 .guide {
   margin: 9px 0 0 1px;
   font-family: 'IBM Plex Mono', monospace;
@@ -64,5 +55,15 @@ input:focus {
 }
 .empty {
   color: #b3261e;
+}
+
+/* Element Plus 기본 스타일을 이 화면 톤(각진 테두리)에 맞춘다 */
+:deep(.el-input__wrapper) {
+  border-radius: 0;
+  background-color: #fff;
+  box-shadow: 0 0 0 1px #9b978e inset;
+}
+:deep(.el-input__wrapper.is-focus) {
+  box-shadow: 0 0 0 1px #1a1a1a inset;
 }
 </style>

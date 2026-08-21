@@ -1,6 +1,20 @@
 <script setup>
 import { computed } from 'vue'
 
+// 경기 상태에 따라 태그 색을 고른다. Element Plus 가 정해 둔 색 이름을 쓴다.
+const tagType = (status) => {
+  if (status === 'LIVE') {
+    return 'danger'
+  }
+  if (status === 'CANCELED' || status === 'DELAYED') {
+    return 'info'
+  }
+  if (status === 'FINAL') {
+    return 'success'
+  }
+  return 'primary'
+}
+
 // 1. 오늘 이 구장의 경기 한 건. 경기가 없으면 null 이 들어온다.
 const props = defineProps({
   game: {
@@ -28,7 +42,9 @@ const hasScore = computed(() => {
   <p v-if="compact" class="line">
     <template v-if="game === null">오늘 경기 없음</template>
     <template v-else>
-      <span class="label" :class="game.status.toLowerCase()">{{ game.statusLabel }}</span>
+      <el-tag :type="tagType(game.status)" size="small" effect="dark">{{
+        game.statusLabel
+      }}</el-tag>
       <span class="bar" :style="{ backgroundColor: game.away.color }"></span>
       {{ game.away.name }}
       <template v-if="hasScore"> {{ game.awayScore }} : {{ game.homeScore }} </template>
@@ -52,7 +68,9 @@ const hasScore = computed(() => {
 
   <div v-else class="board">
     <div class="board-head">
-      <span class="label" :class="game.status.toLowerCase()">{{ game.statusLabel }}</span>
+      <el-tag :type="tagType(game.status)" size="small" effect="dark">{{
+        game.statusLabel
+      }}</el-tag>
       <span v-if="game.status === 'LIVE'" class="inning">{{ game.inning }}회{{ game.half }}</span>
       <span v-else class="inning">{{ game.startTime }}</span>
     </div>
@@ -79,6 +97,11 @@ const hasScore = computed(() => {
 </template>
 
 <style scoped>
+/* Element Plus 태그 모서리를 이 화면 톤(각진 테두리)에 맞춘다 */
+:deep(.el-tag) {
+  border-radius: 0;
+}
+
 /* 한 줄 버전 — 테두리 없이 카드 안에 얹는다 */
 .line {
   display: flex;
@@ -120,20 +143,6 @@ const hasScore = computed(() => {
   align-items: center;
   gap: 8px;
   margin-bottom: 12px;
-}
-.label {
-  padding: 2px 7px;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 11px;
-  color: #fbfaf7;
-  background-color: #6d6a63;
-}
-.label.live {
-  background-color: #b3261e;
-}
-.label.canceled,
-.label.delayed {
-  background-color: #1a1a1a;
 }
 .inning {
   font-family: 'IBM Plex Mono', monospace;
