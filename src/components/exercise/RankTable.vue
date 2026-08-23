@@ -32,22 +32,30 @@ const splitFive = (text) => {
 
 <template>
   <div class="rank">
-    <p class="rank-head">
-      <span>구단 순위</span>
-      <span class="cap">승률 / GB</span>
+    <p class="rank-title">구단 순위</p>
+
+    <!-- 각 칸이 무엇인지 머리글로 알려 준다 -->
+    <p class="rank-cols">
+      <span class="c-no">순위</span>
+      <span class="c-bar"></span>
+      <span class="c-nm">팀</span>
+      <span class="c-rec">승-패</span>
+      <span class="c-rate">승률</span>
+      <span class="c-gb">GB</span>
+      <span class="c-five">최근 5</span>
     </p>
 
     <p v-if="rankList.length === 0" class="rank-empty">순위를 불러오지 못했습니다</p>
 
     <ul v-else>
       <li v-for="item in rankList" :key="item.teamCode" :class="{ mine: item.teamCode === myTeam }">
-        <span class="no">{{ item.rank }}</span>
-        <span class="bar" :style="{ backgroundColor: item.color }"></span>
-        <span class="nm">{{ item.teamName }}</span>
-        <span class="rec">{{ item.win }}-{{ item.lose }}</span>
-        <span class="rate">{{ rateText(item.winRate) }}</span>
-        <span class="gb">{{ behindText(item.behind) }}</span>
-        <span class="five">
+        <span class="c-no no">{{ item.rank }}</span>
+        <span class="c-bar bar" :style="{ backgroundColor: item.color }"></span>
+        <span class="c-nm nm">{{ item.teamName }}</span>
+        <span class="c-rec rec">{{ item.win }}-{{ item.lose }}</span>
+        <span class="c-rate rate">{{ rateText(item.winRate) }}</span>
+        <span class="c-gb gb">{{ behindText(item.behind) }}</span>
+        <span class="c-five five">
           <i v-for="(r, i) in splitFive(item.lastFive)" :key="i" :class="r.toLowerCase()"></i>
         </span>
       </li>
@@ -62,18 +70,38 @@ const splitFive = (text) => {
   background-color: var(--panel);
   overflow: hidden;
 }
-.rank-head {
-  display: flex;
-  justify-content: space-between;
+.rank-title {
   margin: 0;
-  padding: 9px 10px;
-  border-bottom: 1px solid var(--line);
+  padding: 10px 12px 9px 12px;
   font-size: 11px;
   letter-spacing: 0.06em;
   color: var(--muted);
 }
-.rank-head .cap {
+
+/* 본문 줄과 칸 너비를 똑같이 맞춰야 머리글이 제자리에 선다 */
+.rank-cols,
+li {
+  display: grid;
+  grid-template-columns: 26px 3px minmax(0, 1fr) 40px 34px 32px 38px;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px;
+}
+.rank-cols {
+  margin: 0;
+  padding-bottom: 7px;
+  border-bottom: 1px solid var(--line);
+  font-size: 9.5px;
   color: var(--line);
+}
+.c-no,
+.c-rec,
+.c-rate,
+.c-gb {
+  text-align: right;
+}
+.c-five {
+  text-align: center;
 }
 .rank-empty {
   margin: 0;
@@ -87,12 +115,9 @@ ul {
   list-style: none;
 }
 li {
-  display: grid;
-  grid-template-columns: 18px 3px minmax(0, 1fr) auto auto auto auto;
-  align-items: center;
-  gap: 7px;
-  padding: 7px 10px;
-  font-size: 11px;
+  padding-top: 9px;
+  padding-bottom: 9px;
+  font-size: 11.5px;
 }
 li + li {
   border-top: 1px solid var(--line);
@@ -122,8 +147,7 @@ li.mine .nm {
 .rate,
 .gb {
   font-family: 'Galmuri11', monospace;
-  font-size: 10px;
-  text-align: right;
+  font-size: 10.5px;
   white-space: nowrap;
 }
 .rec {
@@ -134,13 +158,13 @@ li.mine .nm {
   color: var(--text);
 }
 .gb {
-  min-width: 22px;
   color: var(--muted);
 }
 /* 최근 다섯 경기를 점 다섯 개로 */
 .five {
   display: flex;
-  gap: 2px;
+  justify-content: center;
+  gap: 3px;
 }
 .five i {
   width: 5px;
