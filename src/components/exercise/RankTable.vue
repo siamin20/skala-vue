@@ -94,11 +94,12 @@ li {
   font-size: 9.5px;
   color: var(--line);
 }
-/* 숫자 칸 머리글은 값과 같은 글꼴을 써야 오른쪽 끝이 맞는다 */
+/* 머리글은 칸 가운데에 둔다 */
 .rank-cols .c-rec,
 .rank-cols .c-rate,
-.rank-cols .c-gb {
-  font-family: 'Galmuri11', monospace;
+.rank-cols .c-gb,
+.rank-cols .c-no {
+  text-align: center;
 }
 .c-no,
 .c-rec,
