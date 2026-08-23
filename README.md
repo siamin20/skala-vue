@@ -218,19 +218,22 @@ VITE_KBO_API_URL=
 
 | 교재 Hands on       | 코드                                                                                                         |
 | ------------------- | ------------------------------------------------------------------------------------------------------------ |
-| Weather Mockup      | [src/data/](https://github.com/siamin20/skala-vue/tree/c399dfd/src/data)                                     |
-| Weather Composition | [WeatherHomeView.vue](https://github.com/siamin20/skala-vue/blob/c399dfd/src/views/WeatherHomeView.vue#L126) |
-| Weather Component   | [components/exercise/](https://github.com/siamin20/skala-vue/tree/c399dfd/src/components/exercise)           |
-| Weather Router      | [router/index.js](https://github.com/siamin20/skala-vue/blob/c399dfd/src/router/index.js)                    |
-| Weather Store       | [stores/](https://github.com/siamin20/skala-vue/tree/c399dfd/src/stores)                                     |
-| Weather Axios       | [api/](https://github.com/siamin20/skala-vue/tree/c399dfd/src/api)                                           |
-| Weather UI Library  | [SearchBar.vue](https://github.com/siamin20/skala-vue/blob/c399dfd/src/components/exercise/SearchBar.vue)    |
-| Weather Deployment  | [vercel.json](https://github.com/siamin20/skala-vue/blob/c399dfd/vercel.json)                                |
+| Weather Mockup      | [src/data/](https://github.com/siamin20/skala-vue/tree/2577b54/src/data)                                     |
+| Weather Composition | [WeatherHomeView.vue](https://github.com/siamin20/skala-vue/blob/2577b54/src/views/WeatherHomeView.vue#L126) |
+| Weather Component   | [components/exercise/](https://github.com/siamin20/skala-vue/tree/2577b54/src/components/exercise)           |
+| Weather Router      | [router/index.js](https://github.com/siamin20/skala-vue/blob/2577b54/src/router/index.js)                    |
+| Weather Store       | [stores/](https://github.com/siamin20/skala-vue/tree/2577b54/src/stores)                                     |
+| Weather Axios       | [api/](https://github.com/siamin20/skala-vue/tree/2577b54/src/api)                                           |
+| Weather UI Library  | [SearchBar.vue](https://github.com/siamin20/skala-vue/blob/2577b54/src/components/exercise/SearchBar.vue)    |
+| Weather Deployment  | [vercel.json](https://github.com/siamin20/skala-vue/blob/2577b54/vercel.json)                                |
+
+검색박스와 리스트박스는 `BaseDashboardCard` 하나로 감싸고, 슬롯으로 `SearchBar` 와 `WeatherCard` 를 넣었다.
+입장권은 눌러서 펼쳤을 때만 부모가 넣어 준 경기 정보를 보여 주는 슬롯을 하나 더 갖는다.
 
 교재 1장 Modern JavaScript는 실습이 없지만 문법을 코드 전반에 썼다.
 옵셔널 체이닝, 널 병합, 구조분해, 스프레드, property shorthand,
 `Object.entries`, Array Methods, async / await.
-코드: [api/kmaApi.js](https://github.com/siamin20/skala-vue/blob/c399dfd/src/api/kmaApi.js)
+코드: [api/kmaApi.js](https://github.com/siamin20/skala-vue/blob/2577b54/src/api/kmaApi.js)
 
 ---
 
