@@ -187,7 +187,7 @@ const stubStyle = computed(() => {
   font-family: 'Galmuri11', sans-serif;
   font-size: 8.5px;
   letter-spacing: 0.14em;
-  color: rgba(255, 255, 255, 0.8);
+  color: #fff;
   white-space: nowrap;
 }
 /* 절취선 */
@@ -285,8 +285,11 @@ const stubStyle = computed(() => {
   border: none;
   background: none;
   font-size: 15px;
-  color: var(--line);
+  color: var(--muted);
   cursor: pointer;
+}
+.btn-team:hover {
+  border-color: transparent;
 }
 .btn-team:hover,
 .btn-team.picked {

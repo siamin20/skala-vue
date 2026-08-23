@@ -418,7 +418,7 @@ h1 {
   background-color: var(--green);
 }
 .group-head.off {
-  color: var(--line);
+  color: var(--muted);
 }
 
 .error {

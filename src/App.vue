@@ -51,13 +51,31 @@ body {
   height: 100vh;
   overflow: hidden;
   background-color: var(--ink);
+  /* 본문은 일반 고딕. 도트 글꼴은 작은 글씨에서 획이 뭉쳐 읽기 어렵다.
+     도트체는 제목과 큰 숫자에만 골라 쓴다. */
   font-family:
-    'Galmuri11',
     'IBM Plex Sans KR',
     -apple-system,
+    BlinkMacSystemFont,
     sans-serif;
   color: var(--text);
-  -webkit-font-smoothing: none;
+}
+
+/* 따로 꾸미지 않은 버튼은 브라우저 기본값(흰 바탕·검은 글씨)이라
+   어두운 판에서 글씨가 안 보인다. 기본값을 판에 맞춰 둔다. */
+button {
+  font-family: inherit;
+  font-size: 12px;
+  color: var(--text);
+  background-color: transparent;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+button:hover {
+  border-color: var(--amber);
+  color: var(--amber);
 }
 </style>
 

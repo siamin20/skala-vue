@@ -99,6 +99,7 @@ onMounted(async () => {
 //     아직 없으면 10분씩 뒤로 물러선다. (없는 시각도 200 을 주므로 이미지 오류로 판단한다)
 const radarBack = ref(20)
 const radarGaveUp = ref(false)
+const radarOpen = ref(false)
 
 const radarUrl = computed(() => {
   const moment = new Date(new Date().getTime() - radarBack.value * 60000)
@@ -241,10 +242,16 @@ const goHome = () => {
             </li>
           </ul>
 
-          <!-- 숫자만으로는 감이 안 오니 레이더 영상도 같이 보여 준다 -->
+          <!-- 숫자만으로는 감이 안 오니 레이더 영상도 볼 수 있게 한다.
+               그림이 크고 흰 바탕이라 접어 두고 눌러서 펴게 했다. -->
           <div v-if="!radarGaveUp" class="radar">
-            <img :src="radarUrl" alt="초단기강수예측" @error="radarFailed" />
-            <p class="radar-cap">레이더 실황과 강수 예측 · 10분 간격</p>
+            <button class="radar-toggle" @click="radarOpen = !radarOpen">
+              {{ radarOpen ? '▾' : '▸' }} 레이더 영상
+            </button>
+            <div v-if="radarOpen" class="radar-box">
+              <img :src="radarUrl" alt="초단기강수예측" @error="radarFailed" />
+              <p class="radar-cap">레이더 실황과 강수 예측 · 10분 간격</p>
+            </div>
           </div>
 
           <p class="credit">자료 제공 기상청</p>
@@ -405,8 +412,16 @@ const goHome = () => {
    기상청 그림이 흰 바탕이라 어두운 판에서 튄다. 액자를 둘러 화면 속 화면처럼 둔다.
    강수 세기를 색으로 읽는 그림이라 색은 건드리지 않고 밝기만 살짝 낮춘다. */
 .radar {
-  margin-top: 14px;
+  margin-top: 12px;
+}
+.radar-toggle {
+  padding: 5px 10px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.radar-box {
   width: fit-content;
+  margin-top: 8px;
   padding: 8px;
   border: 1px solid var(--line);
   border-radius: 5px;
@@ -520,7 +535,7 @@ li {
 dl {
   display: grid;
   grid-template-columns: 132px 1fr;
-  align-items: baseline;
+  align-items: stretch;
   margin: 0 0 30px 0;
   font-size: 14px;
   line-height: 1.5;
@@ -539,7 +554,7 @@ dl {
   background-color: var(--panel-2);
 }
 dt {
-  padding: 9px 0 8px 0;
+  padding: 10px 0 9px 0;
   border-top: 1px solid var(--line);
   font-family: 'IBM Plex Mono', monospace;
   font-size: 11.5px;
@@ -547,13 +562,8 @@ dt {
 }
 dd {
   margin: 0;
-  padding: 8px 0;
+  padding: 9px 0 8px 0;
   border-top: 1px solid var(--line);
-}
-/* 첫 줄 위에는 h2 밑줄이 이미 있어 겹치지 않게 뗀다 */
-dl dt:first-of-type,
-dl dt:first-of-type + dd {
-  border-top: none;
 }
 .gap {
   margin-top: 26px;
