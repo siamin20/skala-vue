@@ -223,6 +223,10 @@ const hasScore = computed(() => {
   flex: 1;
   min-width: 0;
 }
+.side .team {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .side.right {
   justify-content: flex-end;
 }

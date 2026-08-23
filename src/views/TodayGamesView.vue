@@ -153,14 +153,22 @@ h1 {
   flex-direction: column;
   gap: 12px;
 }
+/* 좁은 화면에서는 두 칸이 안 들어가므로 위아래로 쌓는다 */
 .row {
   display: grid;
-  grid-template-columns: 210px 1fr;
-  gap: 14px;
-  align-items: center;
-  padding: 14px 16px;
-  background-color: #fbfaf7;
-  border: 1px solid #004c86;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+  padding: 10px 12px;
+  background-color: #fffdf4;
+  border: 3px solid #004c86;
+  border-radius: 8px;
+  box-shadow: 3px 3px 0 #004c86;
+}
+@media (min-width: 620px) {
+  .row {
+    grid-template-columns: 168px minmax(0, 1fr);
+    align-items: center;
+  }
 }
 .stadium {
   margin: 0;

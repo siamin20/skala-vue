@@ -228,6 +228,8 @@ onUnmounted(() => {
 <style scoped>
 .page-head {
   display: flex;
+  flex-wrap: wrap;
+  gap: 2px 10px;
   align-items: baseline;
   justify-content: space-between;
   padding-bottom: 6px;
@@ -261,7 +263,7 @@ h1 {
 }
 .ticket-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(205px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(205px, 100%), 1fr));
   align-items: start;
   gap: 10px;
 }

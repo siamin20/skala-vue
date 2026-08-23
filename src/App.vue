@@ -1,6 +1,36 @@
 <script setup>
 // 라우터를 쓰면 App.vue 는 내비게이션과 화면이 갈아 끼워질 자리만 갖는다.
+import { computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import UnitToggler from './components/exercise/UnitToggler.vue'
+
+const route = useRoute()
+const router = useRouter()
+
+// 1. 아래 버튼 세 개로 넘길 화면 순서. 진짜 다마고치처럼 버튼만으로 돌아다닐 수 있게 한다.
+const menu = [
+  { path: '/', name: '구장' },
+  { path: '/games', name: '오늘 경기' },
+  { path: '/saju', name: '닮은 선수' },
+  { path: '/about', name: '정보' },
+]
+
+// 2. 지금 몇 번째 화면인지. 목록에 없는 주소(상세 화면 등)면 -1 이 된다.
+const nowIndex = computed(() => {
+  return menu.findIndex((item) => item.path === route.path)
+})
+
+// 3. 앞뒤로 돌린다. 끝에서 넘어가면 처음으로 돌아온다.
+const move = (step) => {
+  const start = nowIndex.value === -1 ? 0 : nowIndex.value
+  const next = (start + step + menu.length) % menu.length
+  router.push(menu[next].path)
+}
+
+// 4. 가운데 버튼은 첫 화면으로 돌아온다.
+const goHome = () => {
+  router.push('/')
+}
 </script>
 
 <template>
@@ -30,11 +60,11 @@ import UnitToggler from './components/exercise/UnitToggler.vue'
         </div>
       </div>
 
-      <!-- 진짜 기계처럼 아래에 버튼 세 개 -->
+      <!-- 진짜 기계처럼 아래 버튼 세 개로도 화면을 넘길 수 있다 -->
       <div class="pad">
-        <span class="btn"></span>
-        <span class="btn mid"></span>
-        <span class="btn"></span>
+        <button class="btn" title="이전 화면" @click="move(-1)">◀</button>
+        <button class="btn mid" title="첫 화면" @click="goHome">●</button>
+        <button class="btn" title="다음 화면" @click="move(1)">▶</button>
       </div>
     </div>
   </div>
@@ -149,13 +179,19 @@ body {
   align-items: center;
   gap: 5px;
   flex-shrink: 0;
+  overflow-x: auto;
   padding: 6px 8px;
   border-bottom: 3px solid #004c86;
   background-color: #cfe9ff;
 }
+.nav-bar::-webkit-scrollbar {
+  height: 0;
+}
 .logo {
+  flex-shrink: 0;
   margin-right: 4px;
   padding: 3px 6px;
+  white-space: nowrap;
   border-radius: 4px;
   background-color: #004c86;
   color: #fff89e;
@@ -167,6 +203,8 @@ body {
   border-radius: 4px;
   background-color: #fff;
   box-shadow: 2px 2px 0 #004c86;
+  flex-shrink: 0;
+  white-space: nowrap;
   font-size: 10px;
   color: #004c86;
   text-decoration: none;
@@ -224,24 +262,81 @@ body {
   margin-top: 20px;
 }
 .btn {
-  width: 30px;
-  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
   border: 4px solid #004c86;
   border-radius: 50%;
-  background: radial-gradient(circle at 36% 32%, #fff 0 22%, #f5b4ae 24% 100%);
+  background-color: #f5b4ae;
   box-shadow: 0 4px 0 rgba(0, 76, 134, 0.32);
+  font-family: 'Galmuri11', sans-serif;
+  font-size: 9px;
+  color: #004c86;
+  cursor: pointer;
+}
+.btn:hover {
+  background-color: #ffc9c4;
+}
+/* 진짜 버튼처럼 눌리면 내려앉는다 */
+.btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 rgba(0, 76, 134, 0.32);
 }
 .btn.mid {
-  background: radial-gradient(circle at 36% 32%, #fff 0 22%, #cfe9ff 24% 100%);
+  background-color: #cfe9ff;
+}
+.btn.mid:hover {
+  background-color: #e4f2ff;
 }
 
+/* 폰처럼 좁고 긴 화면에서는 정사각 액정을 고집하지 않는다.
+   억지로 맞추면 글씨가 세로로 쪼개진다. 세로로 길게 늘려 쓴다. */
 @media (max-width: 720px) {
   .machine {
-    padding-top: 34px;
+    padding: 26px 0 8px 0;
   }
   .ear {
-    width: 42px;
-    height: 66px;
+    width: 46px;
+    height: 68px;
+  }
+  .ear.left {
+    left: calc(50% - 108px);
+  }
+  .ear.right {
+    left: calc(50% + 62px);
+  }
+  .shell {
+    width: 94vw;
+    height: 100%;
+    padding: 26px 18px 14px 18px;
+    border-width: 7px;
+    border-radius: 22% / 9%;
+  }
+  .bezel {
+    flex: 1;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    border-radius: 18px;
+  }
+  .shell::before,
+  .shell::after {
+    top: 50%;
+    width: 18px;
+    height: 30px;
+  }
+  .shell::before {
+    left: 6px;
+  }
+  .shell::after {
+    right: 6px;
+  }
+  .pad {
+    margin-top: 12px;
+    gap: 20px;
   }
 }
 </style>

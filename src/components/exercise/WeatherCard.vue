@@ -140,6 +140,7 @@ const stubStyle = computed(() => {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
+  flex-shrink: 0;
   width: 50px;
   padding: 7px 3px;
   text-align: center;
