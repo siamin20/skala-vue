@@ -209,7 +209,7 @@ const stadiumOf = (cityId) => {
 <template>
   <div>
     <div class="page-head">
-      <h1>나와 닮은 선수</h1>
+      <h1>운명의 선수</h1>
       <p class="count">선수 {{ playerList.length }}명</p>
     </div>
 
@@ -257,11 +257,11 @@ const stadiumOf = (cityId) => {
     </table>
     <p v-if="noticeMessage" class="notice">{{ noticeMessage }}</p>
 
-    <div v-if="mySaju === null" class="msg">생일을 넣어 주세요</div>
+    <div v-if="mySaju === null" class="msg">생일을 넣으면 사주가 닮은 선수를 찾아 줍니다</div>
 
     <div v-else>
       <div v-if="bestMatch" class="best">
-        <p class="best-label">가장 닮은 선수</p>
+        <p class="best-label">사주가 가장 닮았어요</p>
         <p class="best-name">{{ bestMatch.name }}</p>
         <p class="best-team">
           <span>{{ bestMatch.team }}</span>
@@ -284,7 +284,7 @@ const stadiumOf = (cityId) => {
       <p v-else class="msg">겹치는 선수가 없습니다</p>
 
       <div v-if="topList.length > 1" class="rest">
-        <h2>다음으로 닮은 선수</h2>
+        <h2>그다음으로 닮은 선수</h2>
         <ul>
           <li v-for="player in topList.slice(1)" :key="player.name">
             <span class="rank-iljin">{{ player.day }}</span>
@@ -349,7 +349,15 @@ h1 {
   font-size: 11px;
   color: var(--muted);
 }
+.birth-box :deep(.el-input__wrapper) {
+  background-color: var(--panel);
+  box-shadow: 0 0 0 1px var(--line) inset;
+}
+.birth-box :deep(.el-input__wrapper.is-focus) {
+  box-shadow: 0 0 0 1px var(--amber) inset;
+}
 .birth-box :deep(.el-input__inner) {
+  color: var(--text);
   font-family: 'IBM Plex Mono', monospace;
   font-size: 19px;
   letter-spacing: 3px;
@@ -393,6 +401,7 @@ h1 {
   color: var(--red);
 }
 .best-saju {
+  color: var(--amber);
   display: flex;
   gap: 12px;
   margin: 0 0 10px 0;
@@ -412,6 +421,7 @@ h1 {
   border: 1px solid var(--line);
 }
 .best-label {
+  color: var(--amber);
   margin: 0;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 11.5px;
@@ -425,6 +435,7 @@ h1 {
   line-height: 1.1;
 }
 .best-team {
+  color: var(--text);
   display: flex;
   align-items: baseline;
   gap: 9px;
@@ -433,6 +444,7 @@ h1 {
   color: var(--muted);
 }
 .best-reason {
+  color: var(--text);
   display: flex;
   flex-wrap: wrap;
   gap: 4px 12px;

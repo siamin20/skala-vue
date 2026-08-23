@@ -5,6 +5,7 @@ import { useRouter } from 'vue-router'
 import { stadiumList } from '../data/stadiums.js'
 import { todayWeather } from '../data/todayWeather.js'
 import { getWeather, skyText } from '../api/weatherApi.js'
+import { getShortForecast, rainRisk } from '../api/kmaApi.js'
 import { useMyProfileStore } from '../stores/myProfileStore.js'
 import { useGameStore } from '../stores/gameStore.js'
 import BaseDashboardCard from '../components/exercise/BaseDashboardCard.vue'
@@ -21,6 +22,28 @@ const gameStore = useGameStore()
 const weatherList = ref(todayWeather)
 const isLoading = ref(false)
 const errorMessage = ref('')
+
+// 구장별 비 예보. 날씨보다 늦게 도착해도 화면이 멈추지 않게 따로 담는다.
+const rainMap = ref({})
+
+// [추가] 기상청 예보를 구장마다 받아 온다. 돔구장은 비와 무관해서 건너뛴다.
+//        날씨를 다 그린 뒤에 뒤따라 채우므로 첫 화면이 늦어지지 않는다.
+const loadRain = async () => {
+  for (const stadium of stadiumList) {
+    if (stadium.isDome) {
+      continue
+    }
+    try {
+      const forecast = await getShortForecast(stadium.nx, stadium.ny)
+      const risk = rainRisk(forecast, '18:30')
+      if (risk && risk.level !== 'none') {
+        rainMap.value = { ...rainMap.value, [stadium.id]: risk }
+      }
+    } catch (error) {
+      console.warn(`[${stadium.name} 비 예보 실패]`, error.message)
+    }
+  }
+}
 
 // 2. 화면이 붙는 시점에 9개 구장 날씨를 불러온다.
 //    한 도시가 실패해도 나머지는 보여 줘야 하므로 하나씩 순서대로 받는다.
@@ -61,9 +84,11 @@ onMounted(async () => {
   // 경기 정보는 스토어가 실시간 -> 저장됨 -> 목업 순으로 알아서 물러선다.
   // 무료 호스팅이 깨어나는 데 오래 걸릴 수 있어서 기다리지 않고 화면부터 보여 준다.
   gameStore.loadGames()
+  loadRain()
   // 티켓에 붙는 경기 상태도 1분마다 갱신한다
   timer = setInterval(() => {
     gameStore.loadGames()
+    loadRain()
   }, 60000)
 })
 
@@ -121,6 +146,7 @@ const ticketList = computed(() => {
       lon: weather.lon,
       emoji: stadium.emoji,
       skyIcon: skyIcon,
+      rain: rainMap.value[stadium.id],
     }
   })
 })
@@ -225,7 +251,7 @@ onUnmounted(() => {
           <b :class="{ warn: canceledCount > 0 }">{{ canceledCount }}</b>
         </span>
         <span class="stat wide">
-          <em>가장 더운 구장</em>
+          <em>최고 기온</em>
           <b>{{ hottest.name }} {{ hottest.temp }}<i>°</i></b>
         </span>
       </div>

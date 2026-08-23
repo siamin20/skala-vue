@@ -12,7 +12,7 @@ import UnitToggler from './components/exercise/UnitToggler.vue'
       <nav class="menu">
         <RouterLink to="/">구장</RouterLink>
         <RouterLink to="/games">오늘 경기</RouterLink>
-        <RouterLink to="/saju">닮은 선수</RouterLink>
+        <RouterLink to="/saju">운명의 선수</RouterLink>
         <RouterLink to="/about">정보</RouterLink>
       </nav>
 

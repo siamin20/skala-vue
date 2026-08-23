@@ -66,7 +66,7 @@ const stubStyle = computed(() => {
         @error="logoFailed = true"
       />
       <span v-else class="face">{{ cityItem.emoji }}</span>
-      <span class="stub-word">ADMIT ONE</span>
+      <span class="stub-word">직관권</span>
     </div>
 
     <div class="body">
@@ -96,6 +96,11 @@ const stubStyle = computed(() => {
         <span class="when" :class="{ off: !cityItem.hasGame }">
           {{ cityItem.hasGame ? '18:30 경기' : '경기 없음' }}
         </span>
+      </p>
+
+      <!-- 비 예보가 있을 때만 나온다. 이 앱이 답하려는 질문이라 티켓 앞면에 둔다. -->
+      <p v-if="cityItem.rain" class="rain" :class="cityItem.rain.level">
+        ☔ {{ cityItem.rain.text }}
       </p>
 
       <button class="btn-detail" @click.stop="emit('click-detail', cityItem.id)">상세보기</button>
@@ -180,9 +185,9 @@ const stubStyle = computed(() => {
 }
 .stub-word {
   font-family: 'Galmuri11', sans-serif;
-  font-size: 6.5px;
-  letter-spacing: 0.06em;
-  color: rgba(255, 255, 255, 0.72);
+  font-size: 8.5px;
+  letter-spacing: 0.14em;
+  color: rgba(255, 255, 255, 0.8);
   white-space: nowrap;
 }
 /* 절취선 */
@@ -258,6 +263,20 @@ const stubStyle = computed(() => {
 }
 .when.off {
   color: var(--muted);
+}
+
+/* 비 예보 — 셀 만하면 노랑, 많이 오면 빨강 */
+.rain {
+  margin: 0 0 8px 0;
+  padding: 4px 7px;
+  border-radius: 3px;
+  background-color: rgba(255, 176, 32, 0.1);
+  font-size: 11px;
+  color: var(--amber);
+}
+.rain.high {
+  background-color: rgba(255, 107, 107, 0.12);
+  color: var(--red);
 }
 
 .btn-team {
