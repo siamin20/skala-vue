@@ -117,16 +117,16 @@ const goDetail = (cityId) => {
 }
 h1 {
   margin: 0;
-  font-family: 'Black Han Sans', sans-serif;
-  font-size: 30px;
+  font-family: 'Galmuri11', sans-serif;
+  font-size: 20px;
 }
 .count {
   display: flex;
   align-items: baseline;
   gap: 10px;
   margin: 0;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 13px;
+  font-family: 'Galmuri11', monospace;
+  font-size: 11px;
   color: #6d6a63;
 }
 .source {

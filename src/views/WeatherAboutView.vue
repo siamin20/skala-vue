@@ -48,8 +48,8 @@ import { stadiumList } from '../data/stadiums.js'
 }
 h1 {
   margin: 0;
-  font-family: 'Black Han Sans', sans-serif;
-  font-size: 30px;
+  font-family: 'Galmuri11', sans-serif;
+  font-size: 20px;
 }
 
 table {

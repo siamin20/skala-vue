@@ -309,13 +309,13 @@ const stadiumOf = (cityId) => {
 }
 h1 {
   margin: 0;
-  font-family: 'Black Han Sans', sans-serif;
-  font-size: 30px;
+  font-family: 'Galmuri11', sans-serif;
+  font-size: 20px;
 }
 .count {
   margin: 0;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 13px;
+  font-family: 'Galmuri11', monospace;
+  font-size: 11px;
   color: #6d6a63;
 }
 .lead {
@@ -397,8 +397,8 @@ h1 {
   display: flex;
   gap: 12px;
   margin: 0 0 10px 0;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 13px;
+  font-family: 'Galmuri11', monospace;
+  font-size: 11px;
   color: #6d6a63;
 }
 .msg {
@@ -422,8 +422,8 @@ h1 {
 }
 .best-name {
   margin: 6px 0 2px 0;
-  font-family: 'Black Han Sans', sans-serif;
-  font-size: 38px;
+  font-family: 'Galmuri11', sans-serif;
+  font-size: 28px;
   line-height: 1.1;
 }
 .best-team {

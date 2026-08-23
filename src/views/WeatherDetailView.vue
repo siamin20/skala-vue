@@ -306,8 +306,8 @@ const goHome = () => {
 
 h1 {
   margin: 0;
-  font-family: 'Black Han Sans', sans-serif;
-  font-size: 28px;
+  font-family: 'Galmuri11', sans-serif;
+  font-size: 20px;
 }
 .title-row {
   display: flex;
@@ -339,8 +339,8 @@ h1 {
   align-items: baseline;
   gap: 10px;
   margin: 0;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 13px;
+  font-family: 'Galmuri11', monospace;
+  font-size: 11px;
   color: #6d6a63;
 }
 

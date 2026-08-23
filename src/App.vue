@@ -70,79 +70,66 @@ body {
 </style>
 
 <style scoped>
-/* ── 기계 몸통 ───────────────────────────────
-   마메치처럼 둥근 몸에 귀 두 개를 얹고, 가운데를 액정으로 판다.
-   페이지 자체는 움직이지 않고 액정 안쪽만 굴러가게 해서 스크롤을 줄인다. */
-/* 기기를 화면 높이에 정확히 맞춰서 페이지가 스크롤되지 않게 한다.
-   남는 높이는 전부 액정이 가져가고, 넘치는 내용은 액정 안에서만 굴러간다. */
+/* ── 다마고치 본체 ──────────────────────────────
+   진짜 다마고치는 달걀 모양 몸통 한가운데에 작은 정사각 액정이 박혀 있다.
+   몸통이 액정 둘레로 넉넉히 보여야 기계처럼 읽힌다. */
 .machine {
   position: relative;
   display: flex;
-  flex-direction: column;
+  justify-content: center;
   box-sizing: border-box;
-  width: min(1040px, 96vw);
+  align-items: center;
   height: 100vh;
-  margin: 0 auto;
-  padding: 74px 0 10px 0;
+  padding: 34px 0 10px 0;
 }
-/* 귀 — 마메치는 위로 솟은 남색 귀 두 개다 */
+/* 귀 — 마메치의 남색 귀 */
 .ear {
   position: absolute;
-  top: 0;
-  width: 70px;
+  top: 2px;
+  z-index: 0;
+  width: 78px;
   height: 108px;
   background-color: #004c86;
   border-radius: 50% 50% 44% 44% / 62% 62% 22% 22%;
 }
 .ear.left {
-  left: 29%;
-  transform: rotate(-12deg);
+  left: calc(50% - 168px);
+  transform: rotate(-14deg);
 }
 .ear.right {
-  right: 29%;
-  transform: rotate(12deg);
+  left: calc(50% + 90px);
+  transform: rotate(14deg);
 }
 
-/* 몸통 */
+/* 달걀 모양 몸통 */
 .shell {
   position: relative;
   z-index: 1;
   display: flex;
   flex-direction: column;
-  flex: 1;
-  min-height: 0;
-  padding: 20px 24px 10px 24px;
-  border: 9px solid #004c86;
-  border-radius: 46% 46% 40% 40% / 30% 30% 26% 26%;
+  align-items: center;
+  box-sizing: border-box;
+  width: calc(64vh + 116px);
+  max-width: 96vw;
+  padding: 44px 52px 24px 52px;
+  border: 10px solid #004c86;
+  /* 원본 다마고치는 완전한 타원이 아니라 모서리가 살짝 각진 원이다 */
+  border-radius: 30% / 24%;
   background-color: #fff89e;
-  box-shadow: 8px 9px 0 rgba(0, 76, 134, 0.22);
-}
-/* 볼 — 얼굴 양쪽 분홍 자국 */
-.shell::before,
-.shell::after {
-  content: '';
-  position: absolute;
-  bottom: 16px;
-  width: 66px;
-  height: 32px;
-  border-radius: 50%;
-  background-color: #f5b4ae;
-}
-.shell::before {
-  left: 96px;
-}
-.shell::after {
-  right: 96px;
+  box-shadow: 9px 10px 0 rgba(0, 76, 134, 0.2);
 }
 
-/* 액정 테두리 */
+/* 액정 — 정사각형 */
 .bezel {
   display: flex;
-  flex: 1;
-  min-height: 0;
-  padding: 10px;
+  flex-shrink: 0;
+  width: 64vh;
+  height: 64vh;
+  max-width: 100%;
+  margin-top: 0;
+  padding: 9px;
   border: 6px solid #004c86;
-  border-radius: 22px;
+  border-radius: 26px;
   background-color: #004c86;
 }
 .screen {
@@ -151,44 +138,42 @@ body {
   flex: 1;
   min-width: 0;
   min-height: 0;
-  border-radius: 12px;
+  border-radius: 16px;
   background-color: #fdfbe9;
   overflow: hidden;
 }
 
-/* ── 화면 위쪽 메뉴 ─────────────────────────── */
+/* ── 액정 속 메뉴 ───────────────────────────── */
 .nav-bar {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   flex-shrink: 0;
-  padding: 8px 10px;
+  padding: 6px 8px;
   border-bottom: 3px solid #004c86;
   background-color: #cfe9ff;
 }
 .logo {
-  margin-right: 6px;
-  padding: 4px 8px;
-  border: 2px solid #004c86;
+  margin-right: 4px;
+  padding: 3px 6px;
   border-radius: 4px;
   background-color: #004c86;
   color: #fff89e;
-  font-size: 12px;
+  font-size: 11px;
 }
 .nav-bar a {
-  padding: 4px 8px;
+  padding: 3px 6px;
   border: 2px solid #004c86;
   border-radius: 4px;
   background-color: #fff;
   box-shadow: 2px 2px 0 #004c86;
-  font-size: 11px;
+  font-size: 10px;
   color: #004c86;
   text-decoration: none;
 }
 .nav-bar a:hover {
   background-color: #fff89e;
 }
-/* 고른 메뉴는 눌린 것처럼 내려앉는다 */
 .nav-bar a.router-link-exact-active {
   background-color: #f5b4ae;
   box-shadow: none;
@@ -198,49 +183,65 @@ body {
   margin-left: auto;
 }
 
-/* 액정 안쪽만 굴러간다 */
+/* 내용은 액정 안에서만 굴러간다 */
 .content {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding: 16px 16px 26px 16px;
+  padding: 12px 12px 20px 12px;
 }
 .content::-webkit-scrollbar {
-  width: 10px;
+  width: 9px;
 }
 .content::-webkit-scrollbar-thumb {
   border: 2px solid #004c86;
-  border-radius: 0;
   background-color: #f5b4ae;
 }
 
-/* ── 아래 버튼 세 개 ───────────────────────── */
+/* ── 볼과 버튼 ─────────────────────────────── */
+.shell::before,
+.shell::after {
+  content: '';
+  position: absolute;
+  top: 52%;
+  width: 30px;
+  height: 18px;
+  border-radius: 50%;
+  background-color: #f5b4ae;
+}
+.shell::before {
+  left: 26px;
+}
+.shell::after {
+  right: 26px;
+}
 .pad {
   display: flex;
+  align-items: center;
   justify-content: center;
-  gap: 30px;
+  gap: 26px;
   flex-shrink: 0;
-  padding: 10px 0 2px 0;
+  margin-top: 20px;
 }
 .btn {
-  width: 34px;
-  height: 34px;
+  width: 30px;
+  height: 30px;
   border: 4px solid #004c86;
   border-radius: 50%;
   background: radial-gradient(circle at 36% 32%, #fff 0 22%, #f5b4ae 24% 100%);
-  box-shadow: 0 4px 0 rgba(0, 76, 134, 0.35);
+  box-shadow: 0 4px 0 rgba(0, 76, 134, 0.32);
 }
 .btn.mid {
-  background: radial-gradient(circle at 36% 32%, #fff 0 22%, #fff89e 24% 100%);
+  background: radial-gradient(circle at 36% 32%, #fff 0 22%, #cfe9ff 24% 100%);
 }
 
 @media (max-width: 720px) {
   .machine {
-    padding-top: 52px;
+    padding-top: 34px;
   }
   .ear {
-    width: 52px;
-    height: 78px;
+    width: 42px;
+    height: 66px;
   }
 }
 </style>

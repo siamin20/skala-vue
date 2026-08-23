@@ -261,7 +261,7 @@ h1 {
 }
 .ticket-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(205px, 1fr));
   align-items: start;
   gap: 10px;
 }

@@ -140,8 +140,8 @@ const stubStyle = computed(() => {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  width: 58px;
-  padding: 8px 4px;
+  width: 50px;
+  padding: 7px 3px;
   text-align: center;
   color: #fff;
 }
@@ -165,8 +165,8 @@ const stubStyle = computed(() => {
 }
 .logo {
   display: block;
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   margin: 0 auto;
   object-fit: contain;
 }
@@ -189,7 +189,7 @@ const stubStyle = computed(() => {
   position: relative;
   flex: 1;
   min-width: 0;
-  padding: 8px 10px 8px 11px;
+  padding: 7px 8px 7px 9px;
 }
 .place {
   display: flex;
@@ -223,7 +223,7 @@ const stubStyle = computed(() => {
   align-items: baseline;
   margin: 1px 0 3px 0;
   font-family: 'Galmuri11', monospace;
-  font-size: 28px;
+  font-size: 24px;
   font-weight: 600;
   line-height: 1;
   letter-spacing: -0.02em;
