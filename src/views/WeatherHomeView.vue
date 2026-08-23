@@ -134,14 +134,36 @@ const filteredWeatherList = computed(() => {
   return ticketList.value.filter((item) => item.name.includes(keyword))
 })
 
-// [추가] 내 응원팀 구장을 맨 위로 올린 목록
-const sortedList = computed(() => {
-  const mine = filteredWeatherList.value.filter((item) => item.id === myProfileStore.teamCityId)
-  const others = filteredWeatherList.value.filter((item) => item.id !== myProfileStore.teamCityId)
+// [추가] 오늘 경기가 있는 구장. 내 응원팀은 그중에서도 맨 위로 올린다.
+const playingList = computed(() => {
+  const list = filteredWeatherList.value.filter((item) => item.hasGame)
+  const mine = list.filter((item) => item.id === myProfileStore.teamCityId)
+  const others = list.filter((item) => item.id !== myProfileStore.teamCityId)
   return mine.concat(others)
 })
 
+// [추가] 경기가 없는 구장은 아래로 내린다
+const restingList = computed(() => {
+  return filteredWeatherList.value.filter((item) => !item.hasGame)
+})
+
 // 6. 오늘 경기가 열리는 구장 수 (직접 추가한 computed)
+// [추가] 전광판 머리에 띄울 오늘 요약. 첫 화면에서 오늘을 한 줄로 알려 준다.
+const hottest = computed(() => {
+  return ticketList.value.reduce((most, item) => (item.temp > most.temp ? item : most))
+})
+
+const canceledCount = computed(() => {
+  return gameStore.games.filter((item) => item.status === 'CANCELED').length
+})
+
+// 오늘 날짜를 '8월 23일 일요일' 로 적는다
+const todayText = computed(() => {
+  const now = new Date()
+  const days = ['일', '월', '화', '수', '목', '금', '토']
+  return `${now.getMonth() + 1}월 ${now.getDate()}일 ${days[now.getDay()]}요일`
+})
+
 const gameCount = computed(() => {
   return filteredWeatherList.value.filter((item) => item.hasGame).length
 })
@@ -186,13 +208,27 @@ onUnmounted(() => {
 
 <template>
   <div>
-    <div class="page-head">
-      <h1>오늘의 구장</h1>
-      <p v-if="isLoading" class="count">불러오는 중…</p>
-      <p v-else class="count">
-        <span class="source">{{ gameSource }}</span
-        >경기 {{ gameCount }} / 전체 {{ ticketList.length }}
-      </p>
+    <!-- 전광판 머리 — 오늘을 한 줄로 -->
+    <div class="marquee">
+      <div class="marquee-left">
+        <p class="day">{{ todayText }}</p>
+        <h1>오늘의 구장</h1>
+      </div>
+
+      <div class="marquee-stats">
+        <span class="stat">
+          <em>오늘 경기</em>
+          <b>{{ gameCount }}</b>
+        </span>
+        <span class="stat">
+          <em>우천취소</em>
+          <b :class="{ warn: canceledCount > 0 }">{{ canceledCount }}</b>
+        </span>
+        <span class="stat wide">
+          <em>가장 더운 구장</em>
+          <b>{{ hottest.name }} {{ hottest.temp }}<i>°</i></b>
+        </span>
+      </div>
     </div>
 
     <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
@@ -206,10 +242,12 @@ onUnmounted(() => {
       />
     </BaseDashboardCard>
 
-    <BaseDashboardCard>
+    <!-- 오늘 경기가 열리는 구장이 먼저, 쉬는 구장은 아래로 -->
+    <section v-if="playingList.length > 0" class="group">
+      <p class="group-head"><span class="on"></span>오늘 경기 {{ playingList.length }}</p>
       <div class="ticket-grid">
         <WeatherCard
-          v-for="item in sortedList"
+          v-for="item in playingList"
           :key="item.id"
           :city-item="item"
           :is-opened="openedId === item.id"
@@ -219,59 +257,173 @@ onUnmounted(() => {
           <GameScore :game="gameStore.findGame(item.id)" compact />
         </WeatherCard>
       </div>
-    </BaseDashboardCard>
+    </section>
+
+    <section v-if="restingList.length > 0" class="group">
+      <p class="group-head off">오늘 경기 없음 {{ restingList.length }}</p>
+      <div class="ticket-grid">
+        <WeatherCard
+          v-for="item in restingList"
+          :key="item.id"
+          :city-item="item"
+          :is-opened="openedId === item.id"
+          @select-card="selectCard"
+          @click-detail="goDetail"
+        >
+          <GameScore :game="gameStore.findGame(item.id)" compact />
+        </WeatherCard>
+      </div>
+    </section>
+
+    <p v-if="filteredWeatherList.length === 0" class="status-bar">찾는 구장이 없습니다.</p>
 
     <p class="status-bar">{{ selectedCityInfo }}</p>
   </div>
 </template>
 
 <style scoped>
-.page-head {
+/* 화면이 넓어도 글이 가로로 늘어지지 않게 폭을 묶는다 */
+:global(.content > *) {
+  max-width: 1120px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ── 전광판 머리 ────────────────────────────── */
+.marquee {
   display: flex;
   flex-wrap: wrap;
-  gap: 2px 10px;
-  align-items: baseline;
+  align-items: flex-end;
   justify-content: space-between;
-  padding-bottom: 6px;
-  margin-bottom: 10px;
-  border-bottom: 3px solid var(--line);
+  gap: 16px 24px;
+  margin-bottom: 16px;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background:
+    linear-gradient(180deg, var(--panel) 0%, var(--ink) 100%),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.02) 0 1px, transparent 1px 3px);
+}
+.day {
+  margin: 0 0 4px 0;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--muted);
 }
 h1 {
   margin: 0;
   font-family: 'Galmuri11', sans-serif;
-  font-size: 20px;
+  font-size: 22px;
+  color: var(--text);
 }
-.count {
-  margin: 0;
+
+.marquee-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+/* 전광판 칸처럼 이름 아래 숫자를 둔다 */
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 74px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background-color: var(--ink);
+}
+.stat b {
+  font-family: 'Galmuri11', sans-serif;
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 1;
+  color: var(--amber);
+}
+.stat b.warn {
+  color: var(--red);
+}
+.stat b i {
+  font-style: normal;
+  font-size: 13px;
+}
+.stat em {
+  font-style: normal;
+  font-size: 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.stat.wide {
+  min-width: 128px;
+}
+.stat.src b.tag {
+  font-family: 'IBM Plex Sans KR', sans-serif;
+  font-size: 12px;
+  color: var(--green);
+}
+
+/* ── 목록 ──────────────────────────────────── */
+/* 티켓은 비율이 있어야 표처럼 보인다. 가로로 늘이지 않고 격자로 깐다. */
+.ticket-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
+  align-items: start;
+  gap: 14px;
+}
+.group {
+  margin-bottom: 16px;
+}
+.group-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 7px 2px;
   font-size: 11px;
+  letter-spacing: 0.06em;
   color: var(--muted);
 }
-.source {
-  padding: 2px 7px;
-  margin-right: 7px;
-  border: 1px solid var(--line);
-  font-size: 11px;
+/* 경기가 있으면 전광판 불이 켜진 것처럼 초록 점을 찍는다 */
+.group-head .on {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--green);
+}
+.group-head.off {
+  color: var(--line);
 }
 
 .error {
-  padding: 10px 14px;
-  margin-bottom: 16px;
+  margin: 0 0 12px 0;
+  padding: 9px 12px;
   border: 1px solid var(--red);
-  font-size: 13px;
+  border-radius: 3px;
+  font-size: 12px;
   color: var(--red);
 }
-/* 전광판처럼 한 줄씩 쌓는다 */
-.ticket-grid {
-  display: flex;
-  flex-direction: column;
+.status-bar {
+  margin: 12px 0 0 0;
+  padding: 9px 12px;
+  border: 1px dashed var(--line);
+  border-radius: 3px;
+  font-size: 11px;
+  color: var(--muted);
 }
 
-.status-bar {
-  margin: 22px 0 0 0;
-  padding: 10px 14px;
-  border: 1px dashed var(--muted);
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 12.5px;
-  color: var(--muted);
+@media (max-width: 720px) {
+  .marquee {
+    padding: 12px;
+  }
+  h1 {
+    font-size: 18px;
+  }
+  .stat {
+    min-width: 54px;
+    padding: 6px 8px;
+  }
+  .stat b {
+    font-size: 19px;
+  }
 }
 </style>

@@ -252,17 +252,47 @@ const goHome = () => {
 .detail {
   position: relative;
 }
+/* 구단 색이 퍼지며 구장에 들어선 느낌을 준다 */
+@keyframes spread {
+  from {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  to {
+    opacity: 0.34;
+    transform: scale(1);
+  }
+}
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
 /* 구장 분위기 배경 — 구단 색을 크게 번지게 하고 세게 흐린다 */
 .field {
+  animation: spread 0.72s ease-out both;
   position: fixed;
   top: 52px;
   left: 0;
   right: 0;
   height: 340px;
   z-index: 0;
-  opacity: 0.3;
+  opacity: 0.34;
   filter: blur(58px);
   pointer-events: none;
+}
+/* 머리말이 배경보다 살짝 늦게 올라온다 */
+.detail .page-head {
+  animation: rise 0.4s 0.06s ease-out both;
+}
+.detail .temp,
+.detail .meta {
+  animation: rise 0.44s 0.12s ease-out both;
 }
 /* 배경 위에 내용이 올라오게 */
 .detail > *:not(.field) {

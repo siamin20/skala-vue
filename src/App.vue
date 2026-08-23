@@ -1,43 +1,13 @@
 <script setup>
 // 라우터를 쓰면 App.vue 는 내비게이션과 화면이 갈아 끼워질 자리만 갖는다.
-import { computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
 import UnitToggler from './components/exercise/UnitToggler.vue'
-
-const route = useRoute()
-const router = useRouter()
-
-// 1. 좌우 버튼으로 넘길 화면 순서. 전광판을 넘기듯 한 손으로 돌아다닐 수 있게 한다.
-const menu = [
-  { path: '/', name: '구장' },
-  { path: '/games', name: '오늘 경기' },
-  { path: '/saju', name: '닮은 선수' },
-  { path: '/about', name: '정보' },
-]
-
-// 2. 지금 몇 번째 화면인지. 목록에 없는 주소(상세 화면 등)면 -1 이 된다.
-const nowIndex = computed(() => {
-  return menu.findIndex((item) => item.path === route.path)
-})
-
-// 3. 앞뒤로 돌린다. 끝에서 넘어가면 처음으로 돌아온다.
-const move = (step) => {
-  const start = nowIndex.value === -1 ? 0 : nowIndex.value
-  const next = (start + step + menu.length) % menu.length
-  router.push(menu[next].path)
-}
-
-// 4. 가운데 버튼은 첫 화면으로 돌아온다.
-const goHome = () => {
-  router.push('/')
-}
 </script>
 
 <template>
   <!-- 구장 전광판을 본떴다. 검은 판에 도트 글씨, 구단 색은 왼쪽 띠로만 쓴다. -->
   <div class="board">
     <header class="top">
-      <span class="logo">직관 날씨</span>
+      <span class="logo">PLAY BALL</span>
 
       <nav class="menu">
         <RouterLink to="/">구장</RouterLink>
@@ -45,12 +15,6 @@ const goHome = () => {
         <RouterLink to="/saju">닮은 선수</RouterLink>
         <RouterLink to="/about">정보</RouterLink>
       </nav>
-
-      <div class="ctrl">
-        <button title="이전 화면" @click="move(-1)">◀</button>
-        <button title="첫 화면" @click="goHome">●</button>
-        <button title="다음 화면" @click="move(1)">▶</button>
-      </div>
 
       <!-- 온도 단위 전환 -->
       <UnitToggler />
@@ -126,6 +90,7 @@ body {
   display: flex;
   gap: 4px;
   min-width: 0;
+  margin-right: auto;
   overflow-x: auto;
 }
 .menu::-webkit-scrollbar {
@@ -150,31 +115,6 @@ body {
   background-color: var(--amber);
 }
 
-.ctrl {
-  display: flex;
-  gap: 5px;
-  margin-left: auto;
-}
-.ctrl button {
-  width: 26px;
-  height: 26px;
-  padding: 0;
-  border: 1px solid var(--line);
-  border-radius: 3px;
-  background-color: var(--panel-2);
-  font-size: 9px;
-  color: var(--muted);
-  cursor: pointer;
-}
-.ctrl button:hover {
-  border-color: var(--amber);
-  color: var(--amber);
-}
-.ctrl button:active {
-  background-color: var(--amber);
-  color: var(--ink);
-}
-
 /* ── 판 ────────────────────────────────────── */
 .content {
   flex: 1;
@@ -195,24 +135,24 @@ body {
   background-color: var(--amber);
 }
 
-/* 화면 전환 — 들어올 때는 살짝 다가오며 밝아지고, 나갈 때는 옅어진다 */
+/* 화면 전환 — 구장 안으로 빨려 들어가듯 다가오고, 나갈 때는 뒤로 물러나며 사라진다 */
 .screen-enter-active {
   transition:
-    opacity 0.26s ease-out,
-    transform 0.26s ease-out;
+    opacity 0.34s ease-out,
+    transform 0.34s cubic-bezier(0.16, 0.9, 0.3, 1);
 }
 .screen-leave-active {
   transition:
-    opacity 0.16s ease-in,
-    transform 0.16s ease-in;
+    opacity 0.2s ease-in,
+    transform 0.2s ease-in;
 }
 .screen-enter-from {
   opacity: 0;
-  transform: scale(0.985) translateY(6px);
+  transform: scale(0.9) translateY(22px);
 }
 .screen-leave-to {
   opacity: 0;
-  transform: scale(1.005);
+  transform: scale(1.06);
 }
 
 @media (max-width: 720px) {

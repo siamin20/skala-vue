@@ -47,9 +47,9 @@ const stubStyle = computed(() => {
 </script>
 
 <template>
-  <!-- 전광판 한 줄. 왼쪽 구단색 띠 - 로고 - 구장 - 기온 - 상세 -->
+  <!-- 어두운 판 위의 입장권. 왼쪽 스터브(구단) · 절취선 · 오른쪽 본권(날씨) -->
   <div
-    class="row"
+    class="ticket"
     :class="{
       'no-game': !cityItem.hasGame,
       opened: isOpened,
@@ -57,111 +57,168 @@ const stubStyle = computed(() => {
     }"
     @click="emit('select-card', cityItem.id)"
   >
-    <span class="bar" :style="stubStyle"></span>
+    <div class="stub" :style="stubStyle">
+      <img
+        v-if="!logoFailed"
+        class="logo"
+        :src="`/logos/${cityItem.id}.png`"
+        :alt="cityItem.team"
+        @error="logoFailed = true"
+      />
+      <span v-else class="face">{{ cityItem.emoji }}</span>
+      <span class="stub-word">ADMIT ONE</span>
+    </div>
 
-    <img
-      v-if="!logoFailed"
-      class="logo"
-      :src="`/logos/${cityItem.id}.png`"
-      :alt="cityItem.team"
-      @error="logoFailed = true"
-    />
-    <span v-else class="face">{{ cityItem.emoji }}</span>
+    <div class="body">
+      <p class="place">
+        <span class="stadium">{{ cityItem.stadium }}</span>
+        <button
+          class="btn-team"
+          :class="{ picked: myProfileStore.teamCityId === cityItem.id }"
+          :title="
+            myProfileStore.teamCityId === cityItem.id ? '내 응원팀 해제' : '내 응원팀으로 지정'
+          "
+          @click.stop="myProfileStore.setTeam(cityItem.id)"
+        >
+          {{ myProfileStore.teamCityId === cityItem.id ? '★' : '☆' }}
+        </button>
+      </p>
+      <p class="team">{{ cityItem.name }} · {{ cityItem.team }}</p>
 
-    <span class="place">
-      <span class="stadium">{{ cityItem.stadium }}</span>
-      <span class="team">{{ cityItem.name }} {{ cityItem.team }}</span>
-    </span>
+      <p class="temp">
+        {{ displayTemp }}<span class="unit">{{ configStore.unitSymbol }}</span>
+        <span class="sky">{{ cityItem.skyIcon }}</span>
+      </p>
 
-    <span class="temp">
-      {{ displayTemp }}<span class="unit">{{ configStore.unitSymbol }}</span>
-    </span>
-    <span class="sky">{{ cityItem.skyIcon }}</span>
+      <p class="meta">
+        <span>습 {{ cityItem.humidity }}</span>
+        <span>풍 {{ cityItem.wind }}</span>
+        <span class="when" :class="{ off: !cityItem.hasGame }">
+          {{ cityItem.hasGame ? '18:30 경기' : '경기 없음' }}
+        </span>
+      </p>
 
-    <span class="meta">
-      <span>습 {{ cityItem.humidity }}</span>
-      <span>풍 {{ cityItem.wind }}</span>
-    </span>
+      <button class="btn-detail" @click.stop="emit('click-detail', cityItem.id)">상세보기</button>
 
-    <span class="when" :class="{ off: !cityItem.hasGame }">
-      {{ cityItem.hasGame ? '18:30' : '경기 없음' }}
-    </span>
-
-    <button
-      class="btn-team"
-      :class="{ picked: myProfileStore.teamCityId === cityItem.id }"
-      :title="myProfileStore.teamCityId === cityItem.id ? '내 응원팀 해제' : '내 응원팀으로 지정'"
-      @click.stop="myProfileStore.setTeam(cityItem.id)"
-    >
-      {{ myProfileStore.teamCityId === cityItem.id ? '★' : '☆' }}
-    </button>
-
-    <button class="btn-detail" @click.stop="emit('click-detail', cityItem.id)">상세</button>
-
-    <!-- 줄을 눌러 펼쳤을 때만 부모가 넣어 준 내용을 보여 준다 -->
-    <div v-if="isOpened" class="opened-box">
-      <slot />
+      <!-- 티켓을 눌러 펼쳤을 때만 부모가 넣어 준 내용을 보여 준다 -->
+      <div v-if="isOpened" class="opened-box">
+        <slot />
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-/* 전광판 한 줄. 펼치면 아래로 내용이 붙으므로 그리드 두 줄로 잡는다. */
-.row {
-  display: grid;
-  grid-template-columns: 4px 30px minmax(0, 1fr) auto auto auto auto auto auto;
-  align-items: center;
-  gap: 0 12px;
-  padding: 0 12px 0 0;
-  min-height: 46px;
-  border-bottom: 1px solid var(--line);
+/* 가로형 입장권. 절취선 위아래를 반원으로 파내 진짜 표처럼 보이게 한다. */
+.ticket {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  border-radius: 8px;
+  background-color: var(--panel);
   cursor: pointer;
+  transition:
+    background-color 0.15s,
+    transform 0.15s;
 }
-.row:hover {
+.ticket:hover {
   background-color: var(--panel-2);
+  transform: translateY(-2px);
 }
-.row.opened {
+.ticket.opened {
   background-color: var(--panel-2);
+  box-shadow: inset 0 0 0 1px var(--amber);
 }
-.row.my-team .stadium {
+/* 절취선 구멍 — 바탕색으로 찍어 파낸 것처럼 */
+.ticket::before,
+.ticket::after {
+  content: '';
+  position: absolute;
+  left: 66px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background-color: var(--ink);
+  transform: translateX(-50%);
+  z-index: 2;
+}
+.ticket::before {
+  top: -7px;
+}
+.ticket::after {
+  bottom: -7px;
+}
+.ticket.my-team .stadium {
   color: var(--amber);
 }
-/* 경기 없는 구장은 한 단계 뒤로 */
-.row.no-game .stadium,
-.row.no-game .temp,
-.row.no-game .logo {
-  opacity: 0.5;
+.ticket.no-game .body {
+  opacity: 0.6;
+}
+.ticket.no-game .stub {
+  opacity: 0.8;
 }
 
-.bar {
-  align-self: stretch;
-  width: 4px;
+/* 스터브 */
+.stub {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex-shrink: 0;
+  width: 66px;
+  border-radius: 8px 0 0 8px;
 }
 .logo {
-  width: 26px;
-  height: 26px;
+  width: 34px;
+  height: 34px;
   object-fit: contain;
 }
 .face {
-  font-size: 19px;
-  text-align: center;
+  font-size: 26px;
+}
+.stub-word {
+  font-family: 'Galmuri11', sans-serif;
+  font-size: 6.5px;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.72);
+  white-space: nowrap;
+}
+/* 절취선 */
+.stub::after {
+  content: '';
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  right: 0;
+  width: 1px;
+  background-image: repeating-linear-gradient(180deg, var(--ink) 0 5px, transparent 5px 10px);
 }
 
+/* 본권 */
+.body {
+  flex: 1;
+  min-width: 0;
+  padding: 11px 13px 11px 15px;
+}
 .place {
   display: flex;
-  flex-direction: column;
-  min-width: 0;
-  gap: 1px;
-  padding: 7px 0;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
 }
 .stadium {
-  font-size: 13px;
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .team {
-  font-size: 10px;
+  margin: 2px 0 0 0;
+  font-size: 10.5px;
   color: var(--muted);
   white-space: nowrap;
   overflow: hidden;
@@ -169,38 +226,41 @@ const stubStyle = computed(() => {
 }
 
 .temp {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 7px 0 5px 0;
   font-family: 'Galmuri11', sans-serif;
-  font-size: 21px;
+  font-size: 30px;
+  line-height: 1;
   color: var(--amber);
-  white-space: nowrap;
 }
 .unit {
   margin-left: 1px;
-  font-size: 11px;
+  font-family: 'IBM Plex Sans KR', sans-serif;
+  font-size: 12px;
   color: var(--muted);
 }
 .sky {
-  font-size: 15px;
+  font-size: 17px;
 }
 .meta {
   display: flex;
-  gap: 9px;
-  font-size: 10px;
+  flex-wrap: wrap;
+  gap: 3px 10px;
+  margin: 0 0 9px 0;
+  font-size: 10.5px;
   color: var(--muted);
-  white-space: nowrap;
 }
 .when {
-  min-width: 52px;
-  text-align: right;
-  font-size: 11px;
   color: var(--green);
-  white-space: nowrap;
 }
 .when.off {
   color: var(--muted);
 }
 
 .btn-team {
+  flex-shrink: 0;
   padding: 0;
   border: none;
   background: none;
@@ -213,11 +273,13 @@ const stubStyle = computed(() => {
   color: var(--amber);
 }
 .btn-detail {
-  padding: 4px 9px;
+  width: 100%;
+  padding: 5px 0;
   border: 1px solid var(--line);
   border-radius: 3px;
   background-color: transparent;
-  font-size: 10px;
+  font-family: 'IBM Plex Sans KR', sans-serif;
+  font-size: 11px;
   color: var(--muted);
   cursor: pointer;
 }
@@ -226,20 +288,9 @@ const stubStyle = computed(() => {
   color: var(--amber);
 }
 
-/* 펼친 내용은 줄 전체 폭을 쓴다 */
 .opened-box {
-  grid-column: 1 / -1;
-  padding: 2px 0 10px 20px;
-}
-
-@media (max-width: 720px) {
-  .row {
-    grid-template-columns: 4px 26px minmax(0, 1fr) auto auto;
-    gap: 0 9px;
-  }
-  .meta,
-  .sky {
-    display: none;
-  }
+  margin-top: 9px;
+  padding-top: 9px;
+  border-top: 1px dashed var(--line);
 }
 </style>
