@@ -29,18 +29,41 @@ import { stadiumList } from '../data/stadiums.js'
       </tbody>
     </table>
 
+    <h2>가져오는 곳</h2>
     <dl class="source">
+      <dt>현재 날씨 · 대기질</dt>
+      <dd>OpenWeatherMap — 기온, 습도, 바람, 미세먼지</dd>
+
+      <dt>비 예보 · 레이더</dt>
+      <dd>기상청 초단기예보 (공공데이터포털) — 6시간 강수 예보와 강수예측 영상</dd>
+
+      <dt>경기 · 순위</dt>
+      <dd>자체 백엔드 (Spring Boot) — 실시간 점수, 이닝별 전광판, 선발 투수, 구단 순위</dd>
+
+      <dt>사주</dt>
+      <dd>자체 백엔드가 만세력을 대신 조회 — 연주·월주는 절기 기준이라 날짜 계산으로 못 구한다</dd>
+
       <dt>구장 정보</dt>
-      <dd>고정 데이터 (src/data/stadiums.js)</dd>
-      <dt>날씨</dt>
-      <dd>목업 데이터. OpenWeatherMap 연동 예정</dd>
-      <dt>경기 일정</dt>
-      <dd>목업 데이터. 자체 KBO API 연동 예정</dd>
+      <dd>고정 데이터 (src/data/stadiums.js) — 격자 좌표는 기상청 변환식으로 계산</dd>
     </dl>
+
+    <p class="credit">자료 제공 기상청 · 이용허락범위 저작자 표시</p>
   </div>
 </template>
 
 <style scoped>
+h2 {
+  margin: 26px 0 10px 0;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--line);
+  font-family: 'Galmuri11', sans-serif;
+  font-size: 14px;
+}
+.credit {
+  margin: 16px 0 0 0;
+  font-size: 10.5px;
+  color: var(--muted);
+}
 .page-head {
   padding-bottom: 10px;
   margin-bottom: 18px;
