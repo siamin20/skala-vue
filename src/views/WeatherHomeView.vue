@@ -319,37 +319,42 @@ onUnmounted(() => {
           />
         </BaseDashboardCard>
 
-        <section v-if="playingList.length > 0" class="group">
-          <p class="group-head"><span class="on"></span>오늘 경기 {{ playingList.length }}</p>
-          <div class="ticket-grid">
-            <WeatherCard
-              v-for="item in playingList"
-              :key="item.id"
-              :city-item="item"
-              :is-opened="openedId === item.id"
-              @select-card="selectCard"
-              @click-detail="goDetail"
-            >
-              <GameScore :game="gameStore.findGame(item.id)" compact />
-            </WeatherCard>
-          </div>
-        </section>
+        <!-- 교재 요구대로 검색박스와 리스트박스를 같은 상자로 감싼다 -->
+        <BaseDashboardCard v-if="playingList.length > 0">
+          <section class="group">
+            <p class="group-head"><span class="on"></span>오늘 경기 {{ playingList.length }}</p>
+            <div class="ticket-grid">
+              <WeatherCard
+                v-for="item in playingList"
+                :key="item.id"
+                :city-item="item"
+                :is-opened="openedId === item.id"
+                @select-card="selectCard"
+                @click-detail="goDetail"
+              >
+                <GameScore :game="gameStore.findGame(item.id)" compact />
+              </WeatherCard>
+            </div>
+          </section>
+        </BaseDashboardCard>
 
-        <section v-if="restingList.length > 0" class="group">
-          <p class="group-head off">오늘 경기 없음 {{ restingList.length }}</p>
-          <div class="ticket-grid">
-            <WeatherCard
-              v-for="item in restingList"
-              :key="item.id"
-              :city-item="item"
-              :is-opened="openedId === item.id"
-              @select-card="selectCard"
-              @click-detail="goDetail"
-            >
-              <GameScore :game="gameStore.findGame(item.id)" compact />
-            </WeatherCard>
-          </div>
-        </section>
+        <BaseDashboardCard v-if="restingList.length > 0">
+          <section class="group">
+            <p class="group-head off">오늘 경기 없음 {{ restingList.length }}</p>
+            <div class="ticket-grid">
+              <WeatherCard
+                v-for="item in restingList"
+                :key="item.id"
+                :city-item="item"
+                :is-opened="openedId === item.id"
+                @select-card="selectCard"
+                @click-detail="goDetail"
+              >
+                <GameScore :game="gameStore.findGame(item.id)" compact />
+              </WeatherCard>
+            </div>
+          </section>
+        </BaseDashboardCard>
 
         <p v-if="filteredWeatherList.length === 0" class="status-bar">찾는 구장이 없습니다.</p>
       </div>
