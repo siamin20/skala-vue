@@ -241,21 +241,23 @@ const goHome = () => {
               <span class="mm">{{ slot.rainType === '' ? '' : slot.rain + 'mm' }}</span>
             </li>
           </ul>
-
-          <!-- 숫자만으로는 감이 안 오니 레이더 영상도 볼 수 있게 한다.
-               그림이 크고 흰 바탕이라 접어 두고 눌러서 펴게 했다. -->
-          <div v-if="!radarGaveUp" class="radar">
-            <button class="radar-toggle" @click="radarOpen = !radarOpen">
-              {{ radarOpen ? '▾' : '▸' }} 레이더 영상
-            </button>
-            <div v-if="radarOpen" class="radar-box">
-              <img :src="radarUrl" alt="초단기강수예측" @error="radarFailed" />
-              <p class="radar-cap">레이더 실황과 강수 예측 · 10분 간격</p>
-            </div>
-          </div>
-
-          <p class="credit">자료 제공 기상청</p>
         </div>
+
+        <!-- 숫자만으로는 감이 안 오니 레이더 영상도 볼 수 있게 한다.
+             그림이 크고 흰 바탕이라 접어 두고 눌러서 펴게 했다.
+             레이더는 예보와 다른 자료다. 날씨누리 그림을 시각만 계산해서 부르므로
+             예보를 못 받아도 이것만은 보이도록 예보 바깥에 둔다. -->
+        <div v-if="!radarGaveUp" class="radar">
+          <button class="radar-toggle" @click="radarOpen = !radarOpen">
+            {{ radarOpen ? '▾' : '▸' }} 레이더 영상
+          </button>
+          <div v-if="radarOpen" class="radar-box">
+            <img :src="radarUrl" alt="초단기강수예측" @error="radarFailed" />
+            <p class="radar-cap">레이더 실황과 강수 예측 · 10분 간격</p>
+          </div>
+        </div>
+
+        <p class="credit">자료 제공 기상청</p>
       </template>
 
       <h2>대기질</h2>
