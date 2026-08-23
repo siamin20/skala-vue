@@ -26,6 +26,11 @@ const air = ref(null)
 const isLoading = ref(false)
 const errorMessage = ref('')
 
+// 한 자리 수는 앞에 0 을 붙인다.
+const pad2 = (value) => {
+  return value < 10 ? '0' + value : '' + value
+}
+
 // public/logos/{id}.png 가 없으면 이모지를 대신 보여 준다.
 const logoFailed = ref(false)
 
@@ -88,7 +93,33 @@ onMounted(async () => {
   }
 })
 
-// 3. 구장 분위기를 색으로 깔아 준다.
+// 3. 기상청 초단기강수예측 영상.
+//     레이더 실황과 앞으로의 강수 예측이 함께 움직이는 그림이다.
+//     파일 이름이 10분 간격이고 20분쯤 늦게 올라와서, 시각을 계산해 부르고
+//     아직 없으면 10분씩 뒤로 물러선다. (없는 시각도 200 을 주므로 이미지 오류로 판단한다)
+const radarBack = ref(20)
+const radarGaveUp = ref(false)
+
+const radarUrl = computed(() => {
+  const moment = new Date(new Date().getTime() - radarBack.value * 60000)
+  const yyyy = moment.getFullYear()
+  const mm = pad2(moment.getMonth() + 1)
+  const dd = pad2(moment.getDate())
+  const hh = pad2(moment.getHours())
+  const mi = pad2(Math.floor(moment.getMinutes() / 10) * 10)
+  return `https://www.weather.go.kr/w/repositary/image/rdr/img/qpr_${yyyy}${mm}${dd}${hh}${mi}.gif`
+})
+
+// 못 받으면 10분씩 뒤로. 한 시간까지 물러서고도 없으면 접는다.
+const radarFailed = () => {
+  if (radarBack.value >= 80) {
+    radarGaveUp.value = true
+    return
+  }
+  radarBack.value = radarBack.value + 10
+}
+
+// 4. 구장 분위기를 색으로 깔아 준다.
 //    사진은 저작권이 걸려서 구단 색 두 개를 크게 번지게 해 흐릿한 배경을 만든다.
 const fieldStyle = computed(() => {
   if (stadium.value == null) {
@@ -103,7 +134,7 @@ const fieldStyle = computed(() => {
   }
 })
 
-// 4. 경기 시각에 비가 오는지 한 줄로 정리한다. 돔구장은 비와 상관없다.
+// 5. 경기 시각에 비가 오는지 한 줄로 정리한다. 돔구장은 비와 상관없다.
 const rainLine = computed(() => {
   if (stadium.value == null || stadium.value.isDome) {
     return null
@@ -209,6 +240,12 @@ const goHome = () => {
               <span class="mm">{{ slot.rainType === '' ? '' : slot.rain + 'mm' }}</span>
             </li>
           </ul>
+
+          <!-- 숫자만으로는 감이 안 오니 레이더 영상도 같이 보여 준다 -->
+          <div v-if="!radarGaveUp" class="radar">
+            <img :src="radarUrl" alt="초단기강수예측" @error="radarFailed" />
+            <p class="radar-cap">레이더 실황과 강수 예측 · 10분 간격</p>
+          </div>
 
           <p class="credit">자료 제공 기상청</p>
         </div>
@@ -364,6 +401,30 @@ const goHome = () => {
   font-size: 11px;
   color: var(--red);
 }
+/* 초단기강수예측 영상.
+   기상청 그림이 흰 바탕이라 어두운 판에서 튄다. 액자를 둘러 화면 속 화면처럼 둔다.
+   강수 세기를 색으로 읽는 그림이라 색은 건드리지 않고 밝기만 살짝 낮춘다. */
+.radar {
+  margin-top: 14px;
+  width: fit-content;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background-color: var(--panel);
+}
+.radar img {
+  display: block;
+  width: 100%;
+  max-width: 330px;
+  border-radius: 3px;
+  filter: brightness(0.94);
+}
+.radar-cap {
+  margin: 7px 0 1px 2px;
+  font-size: 10.5px;
+  color: var(--muted);
+}
+
 /* 공공데이터 이용허락범위가 "저작자 표시"라 출처를 반드시 밝힌다 */
 .credit {
   margin: 8px 0 0 0;
