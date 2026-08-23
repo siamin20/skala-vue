@@ -266,10 +266,8 @@ const stadiumOf = (cityId) => {
           </tr>
         </tbody>
       </table>
-      <p class="waiting-msg">사주를 세는 중</p>
-      <p v-if="isSlow" class="waiting-slow">
-        서버가 잠들어 있었습니다. 깨우는 데 30초쯤 걸릴 수 있어요
-      </p>
+      <p class="waiting-msg">사주를 불러오는중 . . .</p>
+      <p v-if="isSlow" class="waiting-slow">서버를 깨우는 데 30초 걸려요.</p>
     </div>
 
     <table v-else-if="mySaju" class="pillars">
