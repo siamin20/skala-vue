@@ -234,7 +234,7 @@ onUnmounted(() => {
   justify-content: space-between;
   padding-bottom: 6px;
   margin-bottom: 10px;
-  border-bottom: 3px solid #004c86;
+  border-bottom: 3px solid var(--line);
 }
 h1 {
   margin: 0;
@@ -243,37 +243,35 @@ h1 {
 }
 .count {
   margin: 0;
-  font-family: 'Galmuri11', monospace;
   font-size: 11px;
-  color: #6d6a63;
+  color: var(--muted);
 }
 .source {
   padding: 2px 7px;
   margin-right: 7px;
-  border: 1px solid #cfccc4;
+  border: 1px solid var(--line);
   font-size: 11px;
 }
 
 .error {
   padding: 10px 14px;
   margin-bottom: 16px;
-  border: 1px solid #b3261e;
+  border: 1px solid var(--red);
   font-size: 13px;
-  color: #b3261e;
+  color: var(--red);
 }
+/* 전광판처럼 한 줄씩 쌓는다 */
 .ticket-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(205px, 100%), 1fr));
-  align-items: start;
-  gap: 10px;
+  display: flex;
+  flex-direction: column;
 }
 
 .status-bar {
   margin: 22px 0 0 0;
   padding: 10px 14px;
-  border: 1px dashed #9b978e;
+  border: 1px dashed var(--muted);
   font-family: 'IBM Plex Mono', monospace;
   font-size: 12.5px;
-  color: #6d6a63;
+  color: var(--muted);
 }
 </style>

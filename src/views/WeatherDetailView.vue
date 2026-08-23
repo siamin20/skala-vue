@@ -88,7 +88,22 @@ onMounted(async () => {
   }
 })
 
-// 3. 경기 시각에 비가 오는지 한 줄로 정리한다. 돔구장은 비와 상관없다.
+// 3. 구장 분위기를 색으로 깔아 준다.
+//    사진은 저작권이 걸려서 구단 색 두 개를 크게 번지게 해 흐릿한 배경을 만든다.
+const fieldStyle = computed(() => {
+  if (stadium.value == null) {
+    return {}
+  }
+  const first = stadium.value.color
+  const second = stadium.value.color2 ? stadium.value.color2 : first
+  return {
+    backgroundImage:
+      `radial-gradient(70% 55% at 18% 0%, ${first} 0%, transparent 62%),` +
+      `radial-gradient(60% 50% at 92% 12%, ${second} 0%, transparent 58%)`,
+  }
+})
+
+// 4. 경기 시각에 비가 오는지 한 줄로 정리한다. 돔구장은 비와 상관없다.
 const rainLine = computed(() => {
   if (stadium.value == null || stadium.value.isDome) {
     return null
@@ -139,7 +154,10 @@ const goHome = () => {
       <button @click="goHome">구장 목록으로</button>
     </div>
 
-    <div v-else>
+    <div v-else class="detail">
+      <!-- 구단 색이 번진 배경. 글씨를 가리지 않게 흐리고 어둡게 깐다. -->
+      <span class="field" :style="fieldStyle"></span>
+
       <div class="page-head">
         <div class="title-row">
           <!-- 구단 로고를 구단 색 판에 얹어 어느 구장인지 한눈에 보이게 한다 -->
@@ -231,19 +249,39 @@ const goHome = () => {
 </template>
 
 <style scoped>
+.detail {
+  position: relative;
+}
+/* 구장 분위기 배경 — 구단 색을 크게 번지게 하고 세게 흐린다 */
+.field {
+  position: fixed;
+  top: 52px;
+  left: 0;
+  right: 0;
+  height: 340px;
+  z-index: 0;
+  opacity: 0.3;
+  filter: blur(58px);
+  pointer-events: none;
+}
+/* 배경 위에 내용이 올라오게 */
+.detail > *:not(.field) {
+  position: relative;
+  z-index: 1;
+}
 .page-head {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   padding-bottom: 10px;
   margin-bottom: 22px;
-  border-bottom: 2px solid #004c86;
+  border-bottom: 2px solid var(--line);
 }
 /* 비 예보 */
 .msg-small {
   margin: 0 0 6px 0;
   font-size: 13.5px;
-  color: #6d6a63;
+  color: var(--muted);
 }
 .rain-line {
   margin: 0 0 12px 0;
@@ -251,13 +289,13 @@ const goHome = () => {
   font-weight: 700;
 }
 .rain-line.none {
-  color: #1a7f43;
+  color: var(--green);
 }
 .rain-line.low {
-  color: #a86a00;
+  color: var(--amber);
 }
 .rain-line.high {
-  color: #b3261e;
+  color: var(--red);
 }
 .hours {
   display: flex;
@@ -270,19 +308,19 @@ const goHome = () => {
 .hours li {
   flex: 1 0 62px;
   padding: 8px 4px;
-  border: 1px solid #dedbd4;
+  border: 1px solid var(--line);
   text-align: center;
-  background-color: #fbfaf7;
+  background-color: var(--panel);
 }
 .hours li.wet {
-  border-color: #004c86;
-  background-color: #eef3fa;
+  border-color: var(--line);
+  background-color: var(--panel-2);
 }
 .hours .hour {
   display: block;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 11px;
-  color: #6d6a63;
+  color: var(--muted);
 }
 .hours .what {
   display: block;
@@ -294,14 +332,14 @@ const goHome = () => {
   min-height: 14px;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 11px;
-  color: #b3261e;
+  color: var(--red);
 }
 /* 공공데이터 이용허락범위가 "저작자 표시"라 출처를 반드시 밝힌다 */
 .credit {
   margin: 8px 0 0 0;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 11px;
-  color: #b3afa6;
+  color: var(--muted);
 }
 
 h1 {
@@ -321,7 +359,7 @@ h1 {
   flex-shrink: 0;
   width: 96px;
   height: 96px;
-  border: 3px solid #004c86;
+  border: 3px solid var(--line);
   border-radius: 12px;
   /* 구단 엠블럼이 흰 바탕으로 만들어져 있어 판도 희게 두고 테두리로 구단색을 준다 */
   background-color: #fff;
@@ -339,15 +377,15 @@ h1 {
   align-items: baseline;
   gap: 10px;
   margin: 0;
-  font-family: 'Galmuri11', monospace;
   font-size: 11px;
-  color: #6d6a63;
+  color: var(--muted);
 }
 
 /* 상세 화면에서도 온도가 가장 크다 */
 .temp {
   margin: 0;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'Galmuri11', sans-serif;
+  color: var(--amber);
   font-size: 84px;
   font-weight: 600;
   line-height: 0.95;
@@ -357,7 +395,7 @@ h1 {
   /* ℃ 는 IBM Plex Mono 에 없는 글자라 본문 폰트로 지정해 숫자와 어긋나지 않게 한다 */
   font-family: 'IBM Plex Sans KR', sans-serif;
   font-size: 30px;
-  color: #6d6a63;
+  color: var(--muted);
 }
 .meta {
   display: flex;
@@ -366,13 +404,13 @@ h1 {
   margin: 8px 0 30px 0;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 12.5px;
-  color: #6d6a63;
+  color: var(--muted);
 }
 
 h2 {
   margin: 22px 0 10px 0;
   padding-bottom: 6px;
-  border-bottom: 1px solid #004c86;
+  border-bottom: 1px solid var(--line);
   font-size: 14px;
 }
 ul {
@@ -382,7 +420,7 @@ ul {
 }
 li {
   padding: 9px 0;
-  border-bottom: 1px solid #cfccc4;
+  border-bottom: 1px solid var(--line);
   font-size: 14px;
 }
 /* 이름과 값을 위아래로 쌓으면 줄 간격이 들쭉날쭉해 보인다.
@@ -400,22 +438,25 @@ dl {
   font-size: 17px;
   font-weight: 600;
 }
-/* Element Plus 막대 모서리를 이 화면 톤에 맞춘다 */
+/* Element Plus 막대를 전광판 톤에 맞춘다 */
 :deep(.el-progress-bar__outer),
 :deep(.el-progress-bar__inner) {
   border-radius: 0;
 }
+:deep(.el-progress-bar__outer) {
+  background-color: var(--panel-2);
+}
 dt {
   padding: 9px 0 8px 0;
-  border-top: 1px solid #e6e3dc;
+  border-top: 1px solid var(--line);
   font-family: 'IBM Plex Mono', monospace;
   font-size: 11.5px;
-  color: #6d6a63;
+  color: var(--muted);
 }
 dd {
   margin: 0;
   padding: 8px 0;
-  border-top: 1px solid #e6e3dc;
+  border-top: 1px solid var(--line);
 }
 /* 첫 줄 위에는 h2 밑줄이 이미 있어 겹치지 않게 뗀다 */
 dl dt:first-of-type,
@@ -428,25 +469,25 @@ dl dt:first-of-type + dd {
 .error {
   padding: 10px 14px;
   margin-bottom: 16px;
-  border: 1px solid #b3261e;
+  border: 1px solid var(--red);
   font-size: 13px;
-  color: #b3261e;
+  color: var(--red);
 }
 .msg {
   margin: 0 0 24px 0;
   font-size: 14px;
-  color: #6d6a63;
+  color: var(--muted);
 }
 button {
   padding: 9px 18px;
   background-color: transparent;
-  border: 1px solid #004c86;
+  border: 1px solid var(--line);
   font-family: 'IBM Plex Sans KR', sans-serif;
   font-size: 13px;
   cursor: pointer;
 }
 button:hover {
-  background-color: #004c86;
-  color: #fbfaf7;
+  background-color: var(--line);
+  color: var(--panel);
 }
 </style>

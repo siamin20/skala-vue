@@ -15,15 +15,15 @@ const configStore = useConfigStore()
 .unit-toggler {
   padding: 4px 11px;
   background-color: transparent;
-  border: 1px solid #6d6a63;
+  border: 1px solid var(--muted);
   font-family: 'IBM Plex Mono', monospace;
   font-size: 13px;
-  color: #6d6a63;
+  color: var(--muted);
   cursor: pointer;
 }
 .unit-toggler:hover {
-  border-color: #004c86;
-  background-color: #004c86;
-  color: #dedbd4;
+  border-color: var(--line);
+  background-color: var(--line);
+  color: var(--line);
 }
 </style>

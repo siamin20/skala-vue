@@ -137,10 +137,10 @@ const hasScore = computed(() => {
   margin: 0;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 11.5px;
-  color: #004c86;
+  color: var(--line);
 }
 .none {
-  color: #6d6a63;
+  color: var(--muted);
 }
 .line-head {
   display: flex;
@@ -149,7 +149,7 @@ const hasScore = computed(() => {
   min-width: 0;
 }
 .when {
-  color: #6d6a63;
+  color: var(--muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -184,14 +184,14 @@ const hasScore = computed(() => {
 
 .board {
   padding: 11px 13px;
-  border: 1px solid #004c86;
-  background-color: #fbfaf7;
+  border: 1px solid var(--line);
+  background-color: var(--panel);
 }
 .board.empty {
   padding: 18px 16px;
   border-style: dashed;
-  border-color: #9b978e;
-  color: #6d6a63;
+  border-color: var(--muted);
+  color: var(--muted);
   font-size: 14px;
 }
 .board.empty p {
@@ -207,7 +207,7 @@ const hasScore = computed(() => {
 .inning {
   font-family: 'IBM Plex Mono', monospace;
   font-size: 12px;
-  color: #6d6a63;
+  color: var(--muted);
 }
 
 .match {
@@ -233,7 +233,6 @@ const hasScore = computed(() => {
 .label {
   flex-shrink: 0;
   white-space: nowrap;
-  font-family: 'Galmuri11', monospace;
   font-size: 9px;
   color: rgba(255, 255, 255, 0.72);
 }
@@ -248,6 +247,7 @@ const hasScore = computed(() => {
 /* 두 팀 색이 만나는 자리라 어떤 색 위에서도 읽히도록 어두운 판을 깐다 */
 .score {
   flex-shrink: 0;
+  font-family: 'Galmuri11', monospace;
   padding: 3px 11px;
   border-radius: 3px;
   background-color: rgba(0, 0, 0, 0.34);
@@ -261,8 +261,8 @@ const hasScore = computed(() => {
 .note {
   margin: 12px 0 0 0;
   padding-top: 10px;
-  border-top: 1px dashed #cfccc4;
+  border-top: 1px dashed var(--line);
   font-size: 13px;
-  color: #b3261e;
+  color: var(--red);
 }
 </style>

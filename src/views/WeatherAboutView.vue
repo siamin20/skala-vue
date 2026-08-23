@@ -44,7 +44,7 @@ import { stadiumList } from '../data/stadiums.js'
 .page-head {
   padding-bottom: 10px;
   margin-bottom: 18px;
-  border-bottom: 2px solid #004c86;
+  border-bottom: 2px solid var(--line);
 }
 h1 {
   margin: 0;
@@ -59,16 +59,16 @@ table {
 }
 th {
   padding: 8px 10px;
-  border-bottom: 1px solid #004c86;
+  border-bottom: 1px solid var(--line);
   font-family: 'IBM Plex Mono', monospace;
   font-size: 11.5px;
   font-weight: 500;
   text-align: left;
-  color: #6d6a63;
+  color: var(--muted);
 }
 td {
   padding: 9px 10px;
-  border-bottom: 1px solid #cfccc4;
+  border-bottom: 1px solid var(--line);
 }
 .num {
   font-family: 'IBM Plex Mono', monospace;
@@ -77,9 +77,9 @@ td {
 .dome {
   margin-left: 6px;
   padding: 1px 5px;
-  border: 1px solid #6d6a63;
+  border: 1px solid var(--muted);
   font-size: 10.5px;
-  color: #6d6a63;
+  color: var(--muted);
 }
 
 .source {
@@ -89,7 +89,7 @@ td {
 .source dt {
   font-family: 'IBM Plex Mono', monospace;
   font-size: 11.5px;
-  color: #6d6a63;
+  color: var(--muted);
 }
 .source dd {
   margin: 2px 0 12px 0;

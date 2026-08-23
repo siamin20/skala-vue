@@ -31,18 +31,18 @@ const goHome = () => {
 .msg {
   margin: 12px 0 22px 0;
   font-size: 14px;
-  color: #6d6a63;
+  color: var(--muted);
 }
 button {
   padding: 9px 18px;
   background-color: transparent;
-  border: 1px solid #004c86;
+  border: 1px solid var(--line);
   font-family: 'IBM Plex Sans KR', sans-serif;
   font-size: 13px;
   cursor: pointer;
 }
 button:hover {
-  background-color: #004c86;
-  color: #fbfaf7;
+  background-color: var(--line);
+  color: var(--panel);
 }
 </style>

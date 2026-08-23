@@ -52,22 +52,32 @@ const changeComposing = (event) => {
 
 <style scoped>
 .guide {
-  margin: 5px 0 0 1px;
-  font-family: 'Galmuri11', monospace;
+  margin: 0;
+  padding: 5px 10px 7px 10px;
   font-size: 10px;
-  color: #6d6a63;
+  color: var(--muted);
 }
 .empty {
-  color: #b3261e;
+  color: var(--red);
 }
 
-/* Element Plus 기본 스타일을 이 화면 톤(각진 테두리)에 맞춘다 */
+/* Element Plus 입력칸을 전광판 톤에 맞춘다 */
 :deep(.el-input__wrapper) {
-  border-radius: 5px;
-  background-color: #fff;
-  box-shadow: 0 0 0 2px #004c86 inset;
+  border-radius: 0;
+  background-color: transparent;
+  box-shadow: none;
+  padding: 4px 10px;
 }
-:deep(.el-input__wrapper.is-focus) {
-  box-shadow: 0 0 0 2px #e0348a inset;
+:deep(.el-input__inner) {
+  height: 34px;
+  font-size: 13px;
+  color: var(--text);
+}
+:deep(.el-input__inner::placeholder) {
+  color: var(--muted);
+}
+:deep(.el-input__prefix),
+:deep(.el-input__suffix) {
+  color: var(--muted);
 }
 </style>

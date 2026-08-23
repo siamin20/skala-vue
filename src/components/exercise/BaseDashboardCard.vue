@@ -13,11 +13,10 @@
 
 <style scoped>
 .dash-card {
-  padding: 9px 10px;
-  margin-bottom: 10px;
-  background-color: #fffdf4;
-  border: 3px solid #004c86;
-  border-radius: 8px;
-  box-shadow: 3px 3px 0 #004c86;
+  margin-bottom: 14px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background-color: var(--panel);
+  overflow: hidden;
 }
 </style>

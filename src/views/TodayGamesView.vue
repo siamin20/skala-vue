@@ -113,7 +113,7 @@ const goDetail = (cityId) => {
   justify-content: space-between;
   padding-bottom: 10px;
   margin-bottom: 16px;
-  border-bottom: 2px solid #004c86;
+  border-bottom: 2px solid var(--line);
 }
 h1 {
   margin: 0;
@@ -125,14 +125,13 @@ h1 {
   align-items: baseline;
   gap: 10px;
   margin: 0;
-  font-family: 'Galmuri11', monospace;
   font-size: 11px;
-  color: #6d6a63;
+  color: var(--muted);
 }
 .source {
   padding: 2px 7px;
   margin-right: 7px;
-  border: 1px solid #cfccc4;
+  border: 1px solid var(--line);
   font-size: 11px;
 }
 
@@ -159,10 +158,10 @@ h1 {
   grid-template-columns: minmax(0, 1fr);
   gap: 10px;
   padding: 10px 12px;
-  background-color: #fffdf4;
-  border: 3px solid #004c86;
+  background-color: var(--panel);
+  border: 3px solid var(--line);
   border-radius: 8px;
-  box-shadow: 3px 3px 0 #004c86;
+  box-shadow: 3px 3px 0 var(--line);
 }
 @media (min-width: 620px) {
   .row {
@@ -182,22 +181,22 @@ h1 {
   margin: 3px 0 8px 0;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 11.5px;
-  color: #6d6a63;
+  color: var(--muted);
 }
 .place button {
   padding: 4px 9px;
   background-color: transparent;
-  border: 1px solid #004c86;
+  border: 1px solid var(--line);
   font-family: 'IBM Plex Sans KR', sans-serif;
   font-size: 11.5px;
   cursor: pointer;
 }
 .place button:hover {
-  background-color: #004c86;
-  color: #fbfaf7;
+  background-color: var(--line);
+  color: var(--panel);
 }
 .msg {
   font-size: 14px;
-  color: #6d6a63;
+  color: var(--muted);
 }
 </style>

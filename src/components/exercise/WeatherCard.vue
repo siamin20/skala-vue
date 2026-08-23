@@ -34,12 +34,12 @@ const displayTemp = computed(() => {
   return rawTemp
 })
 
-// 4. 스터브를 구단 대표색으로 칠한다.
-//    잠실처럼 두 팀이 같이 쓰는 구장은 두 색을 비스듬히 이어 붙인다.
+// 4. 왼쪽 띠를 구단 대표색으로 칠한다.
+//    잠실처럼 두 팀이 같이 쓰는 구장은 두 색을 위아래로 이어 붙인다.
 const stubStyle = computed(() => {
   if (props.cityItem.color2) {
     return {
-      backgroundImage: `linear-gradient(150deg, ${props.cityItem.color} 52%, ${props.cityItem.color2} 52%)`,
+      backgroundImage: `linear-gradient(180deg, ${props.cityItem.color} 50%, ${props.cityItem.color2} 50%)`,
     }
   }
   return { backgroundColor: props.cityItem.color }
@@ -47,8 +47,9 @@ const stubStyle = computed(() => {
 </script>
 
 <template>
+  <!-- 전광판 한 줄. 왼쪽 구단색 띠 - 로고 - 구장 - 기온 - 상세 -->
   <div
-    class="ticket"
+    class="row"
     :class="{
       'no-game': !cityItem.hasGame,
       opened: isOpened,
@@ -56,219 +57,189 @@ const stubStyle = computed(() => {
     }"
     @click="emit('select-card', cityItem.id)"
   >
-    <div class="stub" :style="stubStyle">
-      <img
-        v-if="!logoFailed"
-        class="logo"
-        :src="`/logos/${cityItem.id}.png`"
-        :alt="cityItem.team"
-        @error="logoFailed = true"
-      />
-      <span v-else class="face">{{ cityItem.emoji }}</span>
-      <span class="team">{{ cityItem.team }}</span>
-    </div>
+    <span class="bar" :style="stubStyle"></span>
 
-    <div class="body">
-      <p class="place">
-        <span>{{ cityItem.name }}</span>
-        <span>{{ cityItem.stadium }}</span>
-        <button
-          class="btn-team"
-          :class="{ picked: myProfileStore.teamCityId === cityItem.id }"
-          :title="
-            myProfileStore.teamCityId === cityItem.id ? '내 응원팀 해제' : '내 응원팀으로 지정'
-          "
-          @click.stop="myProfileStore.setTeam(cityItem.id)"
-        >
-          {{ myProfileStore.teamCityId === cityItem.id ? '★' : '☆' }}
-        </button>
-      </p>
+    <img
+      v-if="!logoFailed"
+      class="logo"
+      :src="`/logos/${cityItem.id}.png`"
+      :alt="cityItem.team"
+      @error="logoFailed = true"
+    />
+    <span v-else class="face">{{ cityItem.emoji }}</span>
 
-      <p class="temp">
-        {{ displayTemp }}<span class="unit">{{ configStore.unitSymbol }}</span>
-        <span class="sky">{{ cityItem.skyIcon }}</span>
-      </p>
+    <span class="place">
+      <span class="stadium">{{ cityItem.stadium }}</span>
+      <span class="team">{{ cityItem.name }} {{ cityItem.team }}</span>
+    </span>
 
-      <p class="meta">
-        <span>습도 {{ cityItem.humidity }}%</span>
-        <span>바람 {{ cityItem.wind }}m/s</span>
-        <span>{{ cityItem.hasGame ? '18:30 경기' : '경기 없음' }}</span>
-      </p>
+    <span class="temp">
+      {{ displayTemp }}<span class="unit">{{ configStore.unitSymbol }}</span>
+    </span>
+    <span class="sky">{{ cityItem.skyIcon }}</span>
 
-      <button class="btn-detail" @click.stop="emit('click-detail', cityItem.id)">상세보기</button>
+    <span class="meta">
+      <span>습 {{ cityItem.humidity }}</span>
+      <span>풍 {{ cityItem.wind }}</span>
+    </span>
 
-      <!-- 카드를 눌러 펼쳤을 때만 부모가 넣어 준 내용을 보여 준다 -->
-      <div v-if="isOpened" class="opened-box">
-        <slot />
-      </div>
+    <span class="when" :class="{ off: !cityItem.hasGame }">
+      {{ cityItem.hasGame ? '18:30' : '경기 없음' }}
+    </span>
+
+    <button
+      class="btn-team"
+      :class="{ picked: myProfileStore.teamCityId === cityItem.id }"
+      :title="myProfileStore.teamCityId === cityItem.id ? '내 응원팀 해제' : '내 응원팀으로 지정'"
+      @click.stop="myProfileStore.setTeam(cityItem.id)"
+    >
+      {{ myProfileStore.teamCityId === cityItem.id ? '★' : '☆' }}
+    </button>
+
+    <button class="btn-detail" @click.stop="emit('click-detail', cityItem.id)">상세</button>
+
+    <!-- 줄을 눌러 펼쳤을 때만 부모가 넣어 준 내용을 보여 준다 -->
+    <div v-if="isOpened" class="opened-box">
+      <slot />
     </div>
   </div>
 </template>
 
 <style scoped>
-/* 가로형 입장권: 왼쪽 스터브(구단) - 절취선 - 오른쪽 본권(날씨) */
-.ticket {
-  display: flex;
-  min-width: 0;
-  background-color: #fffdf4;
-  border: 3px solid #004c86;
-  border-radius: 8px;
-  box-shadow: 3px 3px 0 #004c86;
+/* 전광판 한 줄. 펼치면 아래로 내용이 붙으므로 그리드 두 줄로 잡는다. */
+.row {
+  display: grid;
+  grid-template-columns: 4px 30px minmax(0, 1fr) auto auto auto auto auto auto;
+  align-items: center;
+  gap: 0 12px;
+  padding: 0 12px 0 0;
+  min-height: 46px;
+  border-bottom: 1px solid var(--line);
   cursor: pointer;
 }
-.ticket.my-team {
-  border-color: #e0348a;
-  box-shadow: 3px 3px 0 #e0348a;
+.row:hover {
+  background-color: var(--panel-2);
 }
-.ticket.opened,
-.ticket:hover {
-  background-color: #fff;
-  box-shadow: 1px 1px 0 #004c86;
-  transform: translate(2px, 2px);
+.row.opened {
+  background-color: var(--panel-2);
 }
-/* 경기 없는 구장은 뒤로 물리되, 어느 구단인지는 알아볼 수 있어야 하므로
-   로고가 있는 스터브는 덜 흐리게 둔다 */
-.no-game .body {
-  opacity: 0.45;
+.row.my-team .stadium {
+  color: var(--amber);
 }
-.no-game .stub {
-  opacity: 0.72;
+/* 경기 없는 구장은 한 단계 뒤로 */
+.row.no-game .stadium,
+.row.no-game .temp,
+.row.no-game .logo {
+  opacity: 0.5;
 }
 
-.stub {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  flex-shrink: 0;
-  width: 50px;
-  padding: 7px 3px;
-  text-align: center;
-  color: #fff;
-}
-/* 스터브와 본권 사이를 미싱 자국처럼 보이게 세로로 구멍을 뚫는다 */
-.stub::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: -4px;
-  width: 8px;
-  height: 100%;
-  background-image: repeating-radial-gradient(
-    circle at center,
-    #dedbd4 0px,
-    #dedbd4 3px,
-    transparent 3px,
-    transparent 8px
-  );
-  background-size: 8px 16px;
-  background-repeat: repeat-y;
+.bar {
+  align-self: stretch;
+  width: 4px;
 }
 .logo {
-  display: block;
-  width: 28px;
-  height: 28px;
-  margin: 0 auto;
+  width: 26px;
+  height: 26px;
   object-fit: contain;
 }
 .face {
-  font-size: 30px;
-  line-height: 1.1;
-}
-.team {
-  margin-top: 4px;
-  font-family: 'Galmuri11', sans-serif;
-  font-size: 9px;
-  line-height: 1.25;
-  word-break: keep-all;
-  color: rgba(255, 255, 255, 0.88);
+  font-size: 19px;
+  text-align: center;
 }
 
-/* flex 자식은 min-width 가 auto 라 안쪽 내용보다 좁아지지 않는다.
-   0 으로 낮춰야 긴 경기 정보가 카드를 뚫고 나가지 않는다. */
-.body {
-  position: relative;
-  flex: 1;
-  min-width: 0;
-  padding: 7px 8px 7px 9px;
-}
 .place {
   display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 3px 8px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  margin: 0;
-  font-size: 12px;
-  color: #6d6a63;
+  flex-direction: column;
+  min-width: 0;
+  gap: 1px;
+  padding: 7px 0;
 }
-.btn-team {
-  padding: 0 3px;
+.stadium {
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.team {
+  font-size: 10px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.temp {
+  font-family: 'Galmuri11', sans-serif;
+  font-size: 21px;
+  color: var(--amber);
+  white-space: nowrap;
+}
+.unit {
   margin-left: 1px;
-  background-color: transparent;
+  font-size: 11px;
+  color: var(--muted);
+}
+.sky {
+  font-size: 15px;
+}
+.meta {
+  display: flex;
+  gap: 9px;
+  font-size: 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.when {
+  min-width: 52px;
+  text-align: right;
+  font-size: 11px;
+  color: var(--green);
+  white-space: nowrap;
+}
+.when.off {
+  color: var(--muted);
+}
+
+.btn-team {
+  padding: 0;
   border: none;
-  font-size: 20px;
-  line-height: 1;
-  color: #cfccc4;
+  background: none;
+  font-size: 15px;
+  color: var(--line);
   cursor: pointer;
 }
 .btn-team:hover,
 .btn-team.picked {
-  color: #c9a227;
-}
-/* 온도가 이 카드에서 가장 크다 */
-.temp {
-  display: flex;
-  align-items: baseline;
-  margin: 1px 0 3px 0;
-  font-family: 'Galmuri11', monospace;
-  font-size: 24px;
-  font-weight: 600;
-  line-height: 1;
-  letter-spacing: -0.02em;
-}
-.unit {
-  /* ℃ 는 IBM Plex Mono 에 없는 글자라 본문 폰트로 지정해 숫자와 어긋나지 않게 한다 */
-  font-family: 'IBM Plex Sans KR', sans-serif;
-  font-size: 18px;
-  color: #6d6a63;
-}
-.sky {
-  margin-left: auto;
-  font-size: 24px;
-}
-.meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2px 9px;
-  margin: 0 0 6px 0;
-  font-family: 'Galmuri11', monospace;
-  font-size: 10px;
-  color: #6d6a63;
+  color: var(--amber);
 }
 .btn-detail {
-  width: 100%;
-  padding: 3px 0;
-  background-color: #ffe3ef;
-  border: 2px solid #004c86;
-  border-radius: 4px;
-  font-family: 'Galmuri11', sans-serif;
+  padding: 4px 9px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background-color: transparent;
   font-size: 10px;
-  color: #004c86;
+  color: var(--muted);
   cursor: pointer;
 }
 .btn-detail:hover {
-  background-color: #004c86;
-  color: #fbfaf7;
+  border-color: var(--amber);
+  color: var(--amber);
 }
 
+/* 펼친 내용은 줄 전체 폭을 쓴다 */
 .opened-box {
-  min-width: 0;
-  padding: 8px 0 10px 0;
-  margin-bottom: 8px;
-  border-top: 1px dashed #cfccc4;
-  border-bottom: 1px dashed #cfccc4;
+  grid-column: 1 / -1;
+  padding: 2px 0 10px 20px;
+}
+
+@media (max-width: 720px) {
+  .row {
+    grid-template-columns: 4px 26px minmax(0, 1fr) auto auto;
+    gap: 0 9px;
+  }
+  .meta,
+  .sky {
+    display: none;
+  }
 }
 </style>

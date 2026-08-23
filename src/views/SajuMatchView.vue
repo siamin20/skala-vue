@@ -305,7 +305,7 @@ const stadiumOf = (cityId) => {
   justify-content: space-between;
   padding-bottom: 10px;
   margin-bottom: 14px;
-  border-bottom: 2px solid #004c86;
+  border-bottom: 2px solid var(--line);
 }
 h1 {
   margin: 0;
@@ -314,14 +314,13 @@ h1 {
 }
 .count {
   margin: 0;
-  font-family: 'Galmuri11', monospace;
   font-size: 11px;
-  color: #6d6a63;
+  color: var(--muted);
 }
 .lead {
   margin: 0 0 20px 0;
   font-size: 14px;
-  color: #6d6a63;
+  color: var(--muted);
 }
 
 .input-row {
@@ -334,10 +333,10 @@ h1 {
 .my-iljin {
   font-family: 'IBM Plex Mono', monospace;
   font-size: 14px;
-  color: #6d6a63;
+  color: var(--muted);
 }
 .my-iljin strong {
-  color: #004c86;
+  color: var(--line);
 }
 
 .birth-box {
@@ -348,7 +347,7 @@ h1 {
   margin-bottom: 5px;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 11px;
-  color: #6d6a63;
+  color: var(--muted);
 }
 .birth-box :deep(.el-input__inner) {
   font-family: 'IBM Plex Mono', monospace;
@@ -360,7 +359,7 @@ h1 {
   font-family: 'IBM Plex Mono', monospace;
   font-size: 12px;
   letter-spacing: 3px;
-  color: #b3afa6;
+  color: var(--muted);
 }
 .pillars {
   border-collapse: collapse;
@@ -371,54 +370,53 @@ h1 {
   font-family: 'IBM Plex Mono', monospace;
   font-size: 11px;
   font-weight: 500;
-  color: #6d6a63;
+  color: var(--muted);
 }
 .pillars td {
   width: 54px;
   height: 54px;
-  border: 1px solid #004c86;
+  border: 1px solid var(--line);
   font-size: 26px;
   text-align: center;
-  background-color: #fbfaf7;
+  background-color: var(--panel);
 }
 .pillars .ji td {
   border-top: none;
 }
 .pillars .empty {
-  color: #cfccc4;
-  background-color: #efece5;
+  color: var(--line);
+  background-color: var(--panel-2);
 }
 .notice {
   margin: 0 0 18px 0;
   font-size: 12.5px;
-  color: #b3261e;
+  color: var(--red);
 }
 .best-saju {
   display: flex;
   gap: 12px;
   margin: 0 0 10px 0;
-  font-family: 'Galmuri11', monospace;
   font-size: 11px;
-  color: #6d6a63;
+  color: var(--muted);
 }
 .msg {
   padding: 40px 0;
   text-align: center;
-  color: #6d6a63;
+  color: var(--muted);
 }
 
 .best {
   padding: 24px;
   margin-bottom: 26px;
-  background-color: #fbfaf7;
-  border: 1px solid #004c86;
+  background-color: var(--panel);
+  border: 1px solid var(--line);
 }
 .best-label {
   margin: 0;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 11.5px;
   letter-spacing: 0.08em;
-  color: #6d6a63;
+  color: var(--muted);
 }
 .best-name {
   margin: 6px 0 2px 0;
@@ -432,7 +430,7 @@ h1 {
   gap: 9px;
   margin: 0 0 10px 0;
   font-size: 13.5px;
-  color: #6d6a63;
+  color: var(--muted);
 }
 .best-reason {
   display: flex;
@@ -441,25 +439,25 @@ h1 {
   margin: 8px 0 16px 0;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 12.5px;
-  color: #6d6a63;
+  color: var(--muted);
 }
 .best button {
   padding: 8px 16px;
   background-color: transparent;
-  border: 1px solid #004c86;
+  border: 1px solid var(--line);
   font-family: 'IBM Plex Sans KR', sans-serif;
   font-size: 13px;
   cursor: pointer;
 }
 .best button:hover {
-  background-color: #004c86;
-  color: #fbfaf7;
+  background-color: var(--line);
+  color: var(--panel);
 }
 
 .rest h2 {
   margin: 0 0 10px 0;
   padding-bottom: 6px;
-  border-bottom: 1px solid #004c86;
+  border-bottom: 1px solid var(--line);
   font-size: 14px;
 }
 .rest ul {
@@ -472,14 +470,14 @@ h1 {
   align-items: center;
   gap: 12px;
   padding: 10px 2px;
-  border-bottom: 1px solid #cfccc4;
+  border-bottom: 1px solid var(--line);
   font-size: 14px;
 }
 .rank-iljin {
   width: 44px;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 12px;
-  color: #6d6a63;
+  color: var(--muted);
 }
 .rank-name {
   width: 80px;
@@ -488,12 +486,12 @@ h1 {
 .rank-team {
   flex: 1;
   font-size: 13px;
-  color: #6d6a63;
+  color: var(--muted);
 }
 
 /* Element Plus 기본 스타일을 이 화면 톤(각진 테두리)에 맞춘다 */
 :deep(.el-input__wrapper) {
   border-radius: 0;
-  box-shadow: 0 0 0 1px #9b978e inset;
+  box-shadow: 0 0 0 1px var(--muted) inset;
 }
 </style>
