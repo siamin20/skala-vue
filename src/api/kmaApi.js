@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 // 기상청 초단기예보 (공공데이터포털). 발표 시각부터 6시간 앞까지 1시간 간격으로 준다.
-// 자료 출처: 기상청 국가기후데이터센터 — 이용허락범위 "저작자 표시"
+// 자료 출처: 기상청 국가기후데이터센터 : 이용허락범위 "저작자 표시"
 const BASE_URL = 'https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0'
 
 // 인증키는 이미 URL 인코딩된 상태라 axios params 에 넘기면 두 번 인코딩된다.

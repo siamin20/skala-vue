@@ -6,16 +6,16 @@ import { getTodayGames } from '../api/kboApi.js'
 
 // 오늘 경기 정보를 한곳에서 관리한다.
 // 백엔드가 꺼져 있거나 배포본처럼 서버가 아예 없는 경우를 대비해 세 단계로 물러선다.
-//   1) 실시간  — 백엔드에서 방금 받아 온 값
-//   2) 저장됨  — 마지막으로 성공했을 때 저장해 둔 값
-//   3) 목업    — 소스에 적어 둔 값
+//   1) 실시간  : 백엔드에서 방금 받아 온 값
+//   2) 저장됨  : 마지막으로 성공했을 때 저장해 둔 값
+//   3) 목업    : 소스에 적어 둔 값
 export const useGameStore = defineStore('game', () => {
   // 1. state
   const games = ref(todayGames)
   const source = ref('목업')
   const savedDate = ref('')
 
-  // 2. getter — 저장된 값이 오늘 것인지
+  // 2. getter : 저장된 값이 오늘 것인지
   const isToday = computed(() => {
     const today = new Date()
     const yyyy = today.getFullYear()
@@ -24,7 +24,7 @@ export const useGameStore = defineStore('game', () => {
     return savedDate.value === `${yyyy}-${mm}-${dd}`
   })
 
-  // 3. action — 불러오기.
+  // 3. action : 불러오기.
   //    무료 호스팅은 깨어나는 데 30초쯤 걸리므로, 저장해 둔 값을 먼저 보여 주고
   //    응답이 오면 그때 실시간 값으로 바꾼다. 기다리는 동안 화면이 비지 않는다.
   const loadGames = async () => {

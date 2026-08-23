@@ -142,7 +142,7 @@ SKALA 4기 6주차 / Frontend-framework : Vue.js
 그래서 시각을 계산해 부르다 보면 아직 없는 파일을 부를 때가 있다.
 이 서버는 없는 파일에도 200을 주면서 GIF 대신 에러 페이지 HTML을 내려준다.
 
-<img>는 HTML을 그림으로 못 읽고 오류를 내므로, 그 오류를 잡아서 10분 전 파일로 다시 시도하도록 했다.
+`<img>`는 HTML을 그림으로 못 읽고 오류를 내므로, 그 오류를 잡아서 10분 전 파일로 다시 시도하도록 했다.
 80분까지 시도해보고, 그래도 없으면 영상을 출력하지 않는다.
 
 ---
@@ -240,4 +240,8 @@ VITE_KBO_API_URL=
 ## 자료 출처
 
 기상청 초단기예보 / 초단기강수예측 (공공데이터포털, 이용허락범위 저작자 표시)
-OpenWeatherMap
+OpenWeatherMap Current Weather / Air Pollution
+네이버 스포츠 (api-gw.sports.naver.com, 비공식)
+사주노트 만세력 (sajunote.com)
+
+글꼴 Galmuri11 (Quiple, SIL OFL 1.1) / IBM Plex Sans KR (IBM, SIL OFL 1.1)
