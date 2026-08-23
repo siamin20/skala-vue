@@ -139,7 +139,7 @@ body {
   flex-direction: column;
   align-items: center;
   box-sizing: border-box;
-  width: calc(64vh + 116px);
+  width: calc(84vh + 116px);
   max-width: 96vw;
   padding: 44px 52px 24px 52px;
   border: 10px solid #004c86;
@@ -153,8 +153,8 @@ body {
 .bezel {
   display: flex;
   flex-shrink: 0;
-  width: 64vh;
-  height: 64vh;
+  width: 84vh;
+  height: 63vh;
   max-width: 100%;
   margin-top: 0;
   padding: 9px;

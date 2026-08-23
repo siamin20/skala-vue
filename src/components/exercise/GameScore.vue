@@ -95,7 +95,9 @@ const hasScore = computed(() => {
       <el-tag :type="tagType(game.status)" size="small" effect="dark">{{
         game.statusLabel
       }}</el-tag>
-      <span v-if="game.status === 'LIVE'" class="inning">{{ game.inning }}회{{ game.half }}</span>
+      <span v-if="game.status === 'LIVE' && game.inning" class="inning"
+        >{{ game.inning }}회{{ game.half }}</span
+      >
       <span v-else class="inning">{{ game.startTime }}</span>
     </div>
 
@@ -212,8 +214,8 @@ const hasScore = computed(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  padding: 14px 14px;
+  gap: 8px;
+  padding: 12px 12px;
   color: #fff;
 }
 .side {
@@ -223,23 +225,24 @@ const hasScore = computed(() => {
   flex: 1;
   min-width: 0;
 }
-.side .team {
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+
 .side.right {
   justify-content: flex-end;
 }
 /* 원정·홈 표시. 팀 이름보다 한 단계 뒤로 물러나게 둔다 */
 .label {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 10px;
+  flex-shrink: 0;
+  white-space: nowrap;
+  font-family: 'Galmuri11', monospace;
+  font-size: 9px;
   color: rgba(255, 255, 255, 0.72);
 }
 .team {
-  font-size: 15px;
+  min-width: 0;
+  font-size: 14px;
   font-weight: 700;
-  white-space: nowrap;
+  /* 좁아도 말줄임표로 지우지 말고 낱말 단위로 접는다 */
+  word-break: keep-all;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
 }
 /* 두 팀 색이 만나는 자리라 어떤 색 위에서도 읽히도록 어두운 판을 깐다 */
