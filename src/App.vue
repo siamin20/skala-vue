@@ -177,7 +177,7 @@ button:hover {
   background-color: var(--amber);
 }
 
-/* 화면 전환 — 구장 안으로 빨려 들어가듯 다가오고, 나갈 때는 뒤로 물러나며 사라진다 */
+/* 화면 전환 : 구장 안으로 빨려 들어가듯 다가오고, 나갈 때는 뒤로 물러나며 사라진다 */
 .screen-enter-active {
   transition:
     opacity 0.34s ease-out,

@@ -180,7 +180,7 @@ const hasScore = computed(() => {
   border-radius: 0;
 }
 
-/* 목록 카드 안 — 폭이 좁아 한 줄에 다 못 들어가므로 위아래로 나눈다 */
+/* 목록 카드 안 : 폭이 좁아 한 줄에 다 못 들어가므로 위아래로 나눈다 */
 .line {
   display: flex;
   flex-direction: column;
@@ -315,7 +315,7 @@ const hasScore = computed(() => {
   white-space: nowrap;
 }
 
-/* 이닝별 전광판 — 진짜 구장 전광판처럼 칸을 나눈다 */
+/* 이닝별 전광판 : 진짜 구장 전광판처럼 칸을 나눈다 */
 .linescore {
   margin-top: 12px;
   overflow-x: auto;

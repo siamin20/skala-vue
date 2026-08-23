@@ -317,7 +317,7 @@ const goHome = () => {
     transform: none;
   }
 }
-/* 구장 분위기 배경 — 구단 색을 크게 번지게 하고 세게 흐린다 */
+/* 구장 분위기 배경 : 구단 색을 크게 번지게 하고 세게 흐린다 */
 .field {
   animation: spread 0.72s ease-out both;
   position: fixed;

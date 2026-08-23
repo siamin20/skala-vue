@@ -133,7 +133,7 @@ const stubStyle = computed(() => {
   background-color: var(--panel-2);
   box-shadow: inset 0 0 0 1px var(--amber);
 }
-/* 절취선 구멍 — 바탕색으로 찍어 파낸 것처럼 */
+/* 절취선 구멍 : 바탕색으로 찍어 파낸 것처럼 */
 .ticket::before,
 .ticket::after {
   content: '';
@@ -257,7 +257,7 @@ const stubStyle = computed(() => {
   color: var(--muted);
 }
 
-/* 비 예보 — 셀 만하면 노랑, 많이 오면 빨강 */
+/* 비 예보 : 셀 만하면 노랑, 많이 오면 빨강 */
 .rain {
   margin: 0 0 8px 0;
   padding: 4px 7px;

@@ -269,7 +269,7 @@ onUnmounted(() => {
 
 <template>
   <div>
-    <!-- 전광판 머리 — 오늘을 한 줄로 -->
+    <!-- 전광판 머리 : 오늘을 한 줄로 -->
     <div class="marquee">
       <div class="marquee-left">
         <p class="day">{{ todayText }}</p>
