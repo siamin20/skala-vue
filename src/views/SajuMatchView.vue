@@ -19,6 +19,9 @@ const birthText = ref(myProfileStore.birthday.split('-').join(''))
 const errorMessage = ref('')
 const mySaju = ref(null)
 const isLoading = ref(false)
+// 무료 호스팅은 잠들어 있다가 깨는 데 시간이 걸린다. 오래 걸리면 이유를 알려 준다.
+const isSlow = ref(false)
+let slowTimer = 0
 const noticeMessage = ref('')
 
 // 한 자리 수는 앞에 0을 붙여 준다.
@@ -95,7 +98,12 @@ const loadSaju = async (dateText) => {
   const iljin = getIljin(dateText)
 
   isLoading.value = true
+  isSlow.value = false
   noticeMessage.value = ''
+  clearTimeout(slowTimer)
+  slowTimer = setTimeout(() => {
+    isSlow.value = true
+  }, 2500)
   try {
     const { year, month, day } = await getSaju(...parts.map(Number))
     mySaju.value = { year, month, day, iljin }
@@ -104,7 +112,9 @@ const loadSaju = async (dateText) => {
     mySaju.value = { year: '', month: '', day: iljin.hanja, iljin }
     noticeMessage.value = '서버에 닿지 못해 일주로만 비교했습니다'
   } finally {
+    clearTimeout(slowTimer)
     isLoading.value = false
+    isSlow.value = false
   }
 }
 
@@ -226,12 +236,43 @@ const stadiumOf = (cityId) => {
         />
         <p class="birth-mask">{{ birthMask }}</p>
       </div>
-      <span v-if="isLoading" class="my-iljin">…</span>
     </div>
     <p v-if="errorMessage" class="notice">{{ errorMessage }}</p>
 
     <!-- 사주 네 기둥. 태어난 시각은 받지 않아 시주 자리는 비워 둔다. -->
-    <table v-if="mySaju" class="pillars">
+    <!-- 기다리는 동안 표 뼈대를 먼저 보여 준다. 화면이 비어 있으면 멈춘 것처럼 보인다. -->
+    <div v-if="isLoading" class="waiting">
+      <table class="pillars skeleton">
+        <thead>
+          <tr>
+            <th>시주</th>
+            <th>일주</th>
+            <th>월주</th>
+            <th>연주</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="empty"></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td class="empty"></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="waiting-msg">사주를 세는 중</p>
+      <p v-if="isSlow" class="waiting-slow">
+        서버가 잠들어 있었습니다. 깨우는 데 30초쯤 걸릴 수 있어요
+      </p>
+    </div>
+
+    <table v-else-if="mySaju" class="pillars">
       <thead>
         <tr>
           <th>시주</th>
@@ -369,6 +410,40 @@ h1 {
   letter-spacing: 3px;
   color: var(--muted);
 }
+/* 기다리는 동안 : 칸이 하나씩 켜졌다 꺼지며 사주를 세는 것처럼 보이게 */
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+.waiting {
+  margin-bottom: 18px;
+}
+.skeleton td:not(.empty) {
+  background-color: var(--panel-2);
+  animation: blink 1.1s ease-in-out infinite;
+}
+.skeleton td:nth-child(3) {
+  animation-delay: 0.15s;
+}
+.skeleton td:nth-child(4) {
+  animation-delay: 0.3s;
+}
+.waiting-msg {
+  margin: 9px 0 0 2px;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+.waiting-slow {
+  margin: 4px 0 0 2px;
+  font-size: 11px;
+  color: var(--amber);
+}
+
 .pillars {
   border-collapse: collapse;
   margin-bottom: 8px;
