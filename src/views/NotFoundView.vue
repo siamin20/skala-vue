@@ -36,13 +36,13 @@ const goHome = () => {
 button {
   padding: 9px 18px;
   background-color: transparent;
-  border: 1px solid #1a1a1a;
+  border: 1px solid #004c86;
   font-family: 'IBM Plex Sans KR', sans-serif;
   font-size: 13px;
   cursor: pointer;
 }
 button:hover {
-  background-color: #1a1a1a;
+  background-color: #004c86;
   color: #fbfaf7;
 }
 </style>

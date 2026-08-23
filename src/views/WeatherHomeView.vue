@@ -230,20 +230,19 @@ onUnmounted(() => {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  padding-bottom: 10px;
-  margin-bottom: 18px;
-  border-bottom: 2px solid #1a1a1a;
+  padding-bottom: 6px;
+  margin-bottom: 10px;
+  border-bottom: 3px solid #004c86;
 }
 h1 {
   margin: 0;
-  font-family: 'Black Han Sans', sans-serif;
-  font-size: 30px;
-  letter-spacing: -0.01em;
+  font-family: 'Galmuri11', sans-serif;
+  font-size: 20px;
 }
 .count {
   margin: 0;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 13px;
+  font-family: 'Galmuri11', monospace;
+  font-size: 11px;
   color: #6d6a63;
 }
 .source {
@@ -262,9 +261,9 @@ h1 {
 }
 .ticket-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   align-items: start;
-  gap: 12px;
+  gap: 10px;
 }
 
 .status-bar {

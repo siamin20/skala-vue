@@ -22,8 +22,8 @@ const configStore = useConfigStore()
   cursor: pointer;
 }
 .unit-toggler:hover {
-  border-color: #1a1a1a;
-  background-color: #1a1a1a;
+  border-color: #004c86;
+  background-color: #004c86;
   color: #dedbd4;
 }
 </style>

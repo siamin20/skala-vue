@@ -37,7 +37,7 @@ const changeComposing = (event) => {
     <el-input
       :model-value="keyword"
       placeholder="도시 이름 (예: 서울, 대구)"
-      size="large"
+      size="default"
       clearable
       :prefix-icon="Search"
       @update:model-value="changeKeyword"
@@ -52,9 +52,9 @@ const changeComposing = (event) => {
 
 <style scoped>
 .guide {
-  margin: 9px 0 0 1px;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 12px;
+  margin: 5px 0 0 1px;
+  font-family: 'Galmuri11', monospace;
+  font-size: 10px;
   color: #6d6a63;
 }
 .empty {
@@ -63,11 +63,11 @@ const changeComposing = (event) => {
 
 /* Element Plus 기본 스타일을 이 화면 톤(각진 테두리)에 맞춘다 */
 :deep(.el-input__wrapper) {
-  border-radius: 0;
+  border-radius: 5px;
   background-color: #fff;
-  box-shadow: 0 0 0 1px #9b978e inset;
+  box-shadow: 0 0 0 2px #004c86 inset;
 }
 :deep(.el-input__wrapper.is-focus) {
-  box-shadow: 0 0 0 1px #1a1a1a inset;
+  box-shadow: 0 0 0 2px #e0348a inset;
 }
 </style>

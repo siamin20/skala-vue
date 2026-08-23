@@ -113,7 +113,7 @@ const goDetail = (cityId) => {
   justify-content: space-between;
   padding-bottom: 10px;
   margin-bottom: 16px;
-  border-bottom: 2px solid #1a1a1a;
+  border-bottom: 2px solid #004c86;
 }
 h1 {
   margin: 0;
@@ -160,7 +160,7 @@ h1 {
   align-items: center;
   padding: 14px 16px;
   background-color: #fbfaf7;
-  border: 1px solid #1a1a1a;
+  border: 1px solid #004c86;
 }
 .stadium {
   margin: 0;
@@ -179,13 +179,13 @@ h1 {
 .place button {
   padding: 4px 9px;
   background-color: transparent;
-  border: 1px solid #1a1a1a;
+  border: 1px solid #004c86;
   font-family: 'IBM Plex Sans KR', sans-serif;
   font-size: 11.5px;
   cursor: pointer;
 }
 .place button:hover {
-  background-color: #1a1a1a;
+  background-color: #004c86;
   color: #fbfaf7;
 }
 .msg {

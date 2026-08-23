@@ -305,7 +305,7 @@ const stadiumOf = (cityId) => {
   justify-content: space-between;
   padding-bottom: 10px;
   margin-bottom: 14px;
-  border-bottom: 2px solid #1a1a1a;
+  border-bottom: 2px solid #004c86;
 }
 h1 {
   margin: 0;
@@ -337,7 +337,7 @@ h1 {
   color: #6d6a63;
 }
 .my-iljin strong {
-  color: #1a1a1a;
+  color: #004c86;
 }
 
 .birth-box {
@@ -376,7 +376,7 @@ h1 {
 .pillars td {
   width: 54px;
   height: 54px;
-  border: 1px solid #1a1a1a;
+  border: 1px solid #004c86;
   font-size: 26px;
   text-align: center;
   background-color: #fbfaf7;
@@ -411,7 +411,7 @@ h1 {
   padding: 24px;
   margin-bottom: 26px;
   background-color: #fbfaf7;
-  border: 1px solid #1a1a1a;
+  border: 1px solid #004c86;
 }
 .best-label {
   margin: 0;
@@ -446,20 +446,20 @@ h1 {
 .best button {
   padding: 8px 16px;
   background-color: transparent;
-  border: 1px solid #1a1a1a;
+  border: 1px solid #004c86;
   font-family: 'IBM Plex Sans KR', sans-serif;
   font-size: 13px;
   cursor: pointer;
 }
 .best button:hover {
-  background-color: #1a1a1a;
+  background-color: #004c86;
   color: #fbfaf7;
 }
 
 .rest h2 {
   margin: 0 0 10px 0;
   padding-bottom: 6px;
-  border-bottom: 1px solid #1a1a1a;
+  border-bottom: 1px solid #004c86;
   font-size: 14px;
 }
 .rest ul {

@@ -44,7 +44,7 @@ import { stadiumList } from '../data/stadiums.js'
 .page-head {
   padding-bottom: 10px;
   margin-bottom: 18px;
-  border-bottom: 2px solid #1a1a1a;
+  border-bottom: 2px solid #004c86;
 }
 h1 {
   margin: 0;
@@ -59,7 +59,7 @@ table {
 }
 th {
   padding: 8px 10px;
-  border-bottom: 1px solid #1a1a1a;
+  border-bottom: 1px solid #004c86;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 11.5px;
   font-weight: 500;

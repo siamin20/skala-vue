@@ -110,19 +110,21 @@ const stubStyle = computed(() => {
 .ticket {
   display: flex;
   min-width: 0;
-  background-color: #fbfaf7;
-  border: 1px solid #1a1a1a;
+  background-color: #fffdf4;
+  border: 3px solid #004c86;
+  border-radius: 8px;
+  box-shadow: 3px 3px 0 #004c86;
   cursor: pointer;
 }
 .ticket.my-team {
-  border-width: 2px;
+  border-color: #e0348a;
+  box-shadow: 3px 3px 0 #e0348a;
 }
-.ticket.opened {
-  box-shadow: 4px 4px 0 #1a1a1a;
-}
+.ticket.opened,
 .ticket:hover {
   background-color: #fff;
-  box-shadow: 4px 4px 0 #1a1a1a;
+  box-shadow: 1px 1px 0 #004c86;
+  transform: translate(2px, 2px);
 }
 /* 경기 없는 구장은 뒤로 물리되, 어느 구단인지는 알아볼 수 있어야 하므로
    로고가 있는 스터브는 덜 흐리게 둔다 */
@@ -138,8 +140,8 @@ const stubStyle = computed(() => {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  width: 74px;
-  padding: 12px 6px;
+  width: 58px;
+  padding: 8px 4px;
   text-align: center;
   color: #fff;
 }
@@ -163,8 +165,8 @@ const stubStyle = computed(() => {
 }
 .logo {
   display: block;
-  width: 38px;
-  height: 38px;
+  width: 32px;
+  height: 32px;
   margin: 0 auto;
   object-fit: contain;
 }
@@ -173,8 +175,11 @@ const stubStyle = computed(() => {
   line-height: 1.1;
 }
 .team {
-  margin-top: 5px;
-  font-size: 11px;
+  margin-top: 4px;
+  font-family: 'Galmuri11', sans-serif;
+  font-size: 9px;
+  line-height: 1.25;
+  word-break: keep-all;
   color: rgba(255, 255, 255, 0.88);
 }
 
@@ -184,7 +189,7 @@ const stubStyle = computed(() => {
   position: relative;
   flex: 1;
   min-width: 0;
-  padding: 11px 13px 10px 14px;
+  padding: 8px 10px 8px 11px;
 }
 .place {
   display: flex;
@@ -216,9 +221,9 @@ const stubStyle = computed(() => {
 .temp {
   display: flex;
   align-items: baseline;
-  margin: 3px 0 6px 0;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 44px;
+  margin: 1px 0 3px 0;
+  font-family: 'Galmuri11', monospace;
+  font-size: 28px;
   font-weight: 600;
   line-height: 1;
   letter-spacing: -0.02em;
@@ -236,24 +241,25 @@ const stubStyle = computed(() => {
 .meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px 12px;
-  margin: 0 0 8px 0;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 11px;
+  gap: 2px 9px;
+  margin: 0 0 6px 0;
+  font-family: 'Galmuri11', monospace;
+  font-size: 10px;
   color: #6d6a63;
 }
 .btn-detail {
   width: 100%;
-  padding: 5px 0;
-  background-color: transparent;
-  border: 1px solid #1a1a1a;
-  font-family: 'IBM Plex Sans KR', sans-serif;
-  font-size: 11.5px;
-  color: #1a1a1a;
+  padding: 3px 0;
+  background-color: #ffe3ef;
+  border: 2px solid #004c86;
+  border-radius: 4px;
+  font-family: 'Galmuri11', sans-serif;
+  font-size: 10px;
+  color: #004c86;
   cursor: pointer;
 }
 .btn-detail:hover {
-  background-color: #1a1a1a;
+  background-color: #004c86;
   color: #fbfaf7;
 }
 

@@ -135,7 +135,7 @@ const hasScore = computed(() => {
   margin: 0;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 11.5px;
-  color: #1a1a1a;
+  color: #004c86;
 }
 .none {
   color: #6d6a63;
@@ -182,7 +182,7 @@ const hasScore = computed(() => {
 
 .board {
   padding: 11px 13px;
-  border: 1px solid #1a1a1a;
+  border: 1px solid #004c86;
   background-color: #fbfaf7;
 }
 .board.empty {

@@ -188,7 +188,7 @@ const goHome = () => {
             <li v-for="slot in forecast" :key="slot.time" :class="{ wet: slot.rainType !== '' }">
               <span class="hour">{{ slot.time.slice(0, 2) }}시</span>
               <span class="what">{{ slot.rainType === '' ? '—' : slot.rainType }}</span>
-              <span class="mm">{{ slot.rain === 0 ? '' : slot.rain + 'mm' }}</span>
+              <span class="mm">{{ slot.rainType === '' ? '' : slot.rain + 'mm' }}</span>
             </li>
           </ul>
 
@@ -237,7 +237,7 @@ const goHome = () => {
   justify-content: space-between;
   padding-bottom: 10px;
   margin-bottom: 22px;
-  border-bottom: 2px solid #1a1a1a;
+  border-bottom: 2px solid #004c86;
 }
 /* 비 예보 */
 .msg-small {
@@ -275,7 +275,7 @@ const goHome = () => {
   background-color: #fbfaf7;
 }
 .hours li.wet {
-  border-color: #1a1a1a;
+  border-color: #004c86;
   background-color: #eef3fa;
 }
 .hours .hour {
@@ -321,7 +321,7 @@ h1 {
   flex-shrink: 0;
   width: 96px;
   height: 96px;
-  border: 3px solid #1a1a1a;
+  border: 3px solid #004c86;
   border-radius: 12px;
   /* 구단 엠블럼이 흰 바탕으로 만들어져 있어 판도 희게 두고 테두리로 구단색을 준다 */
   background-color: #fff;
@@ -370,9 +370,9 @@ h1 {
 }
 
 h2 {
-  margin: 0 0 10px 0;
+  margin: 22px 0 10px 0;
   padding-bottom: 6px;
-  border-bottom: 1px solid #1a1a1a;
+  border-bottom: 1px solid #004c86;
   font-size: 14px;
 }
 ul {
@@ -389,7 +389,7 @@ li {
    두 칸으로 나란히 놓고 줄마다 같은 간격을 준다. */
 dl {
   display: grid;
-  grid-template-columns: 76px 1fr;
+  grid-template-columns: 132px 1fr;
   align-items: baseline;
   margin: 0 0 30px 0;
   font-size: 14px;
@@ -423,7 +423,7 @@ dl dt:first-of-type + dd {
   border-top: none;
 }
 .gap {
-  margin-top: 30px;
+  margin-top: 26px;
 }
 .error {
   padding: 10px 14px;
@@ -440,13 +440,13 @@ dl dt:first-of-type + dd {
 button {
   padding: 9px 18px;
   background-color: transparent;
-  border: 1px solid #1a1a1a;
+  border: 1px solid #004c86;
   font-family: 'IBM Plex Sans KR', sans-serif;
   font-size: 13px;
   cursor: pointer;
 }
 button:hover {
-  background-color: #1a1a1a;
+  background-color: #004c86;
   color: #fbfaf7;
 }
 </style>
