@@ -12,6 +12,8 @@ import BaseDashboardCard from '../components/exercise/BaseDashboardCard.vue'
 import SearchBar from '../components/exercise/SearchBar.vue'
 import WeatherCard from '../components/exercise/WeatherCard.vue'
 import GameScore from '../components/exercise/GameScore.vue'
+import RankTable from '../components/exercise/RankTable.vue'
+import { getRank } from '../api/kboApi.js'
 
 const router = useRouter()
 const myProfileStore = useMyProfileStore()
@@ -25,6 +27,17 @@ const errorMessage = ref('')
 
 // 구장별 비 예보. 날씨보다 늦게 도착해도 화면이 멈추지 않게 따로 담는다.
 const rainMap = ref({})
+
+// 구단 순위표. 백엔드가 없으면 빈 배열로 두고 화면만 접는다.
+const rankList = ref([])
+
+const loadRank = async () => {
+  try {
+    rankList.value = await getRank()
+  } catch (error) {
+    console.warn('[순위 조회 실패]', error.message)
+  }
+}
 
 // [추가] 기상청 예보를 구장마다 받아 온다. 돔구장은 비와 무관해서 건너뛴다.
 //        날씨를 다 그린 뒤에 뒤따라 채우므로 첫 화면이 늦어지지 않는다.
@@ -85,6 +98,7 @@ onMounted(async () => {
   // 무료 호스팅이 깨어나는 데 오래 걸릴 수 있어서 기다리지 않고 화면부터 보여 준다.
   gameStore.loadGames()
   loadRain()
+  loadRank()
   // 티켓에 붙는 경기 상태도 1분마다 갱신한다
   timer = setInterval(() => {
     gameStore.loadGames()
@@ -160,17 +174,32 @@ const filteredWeatherList = computed(() => {
   return ticketList.value.filter((item) => item.name.includes(keyword))
 })
 
+// [추가] 별을 찍어 둔 응원팀 구장. 맨 위에 크게 한 줄로 올린다.
+const myTicket = computed(() => {
+  return filteredWeatherList.value.find((item) => item.id === myProfileStore.teamCityId)
+})
+
+// [추가] 응원팀의 구단 코드. 순위표에서 그 줄만 강조하는 데 쓴다.
+const myTeamCode = computed(() => {
+  const game = gameStore.findGame(myProfileStore.teamCityId)
+  if (game === null) {
+    return ''
+  }
+  return game.home.code
+})
+
 // [추가] 오늘 경기가 있는 구장. 내 응원팀은 그중에서도 맨 위로 올린다.
 const playingList = computed(() => {
-  const list = filteredWeatherList.value.filter((item) => item.hasGame)
-  const mine = list.filter((item) => item.id === myProfileStore.teamCityId)
-  const others = list.filter((item) => item.id !== myProfileStore.teamCityId)
-  return mine.concat(others)
+  return filteredWeatherList.value.filter(
+    (item) => item.hasGame && item.id !== myProfileStore.teamCityId,
+  )
 })
 
 // [추가] 경기가 없는 구장은 아래로 내린다
 const restingList = computed(() => {
-  return filteredWeatherList.value.filter((item) => !item.hasGame)
+  return filteredWeatherList.value.filter(
+    (item) => !item.hasGame && item.id !== myProfileStore.teamCityId,
+  )
 })
 
 // 6. 오늘 경기가 열리는 구장 수 (직접 추가한 computed)
@@ -259,49 +288,71 @@ onUnmounted(() => {
 
     <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
 
-    <BaseDashboardCard>
-      <SearchBar
-        :keyword="searchQuery"
-        :total-count="ticketList.length"
-        :result-count="filteredWeatherList.length"
-        @update-query="searchQuery = $event"
-      />
-    </BaseDashboardCard>
+    <div class="cols">
+      <div class="main-col">
+        <!-- 별을 찍어 둔 구장은 맨 위에 크게 -->
+        <section v-if="myTicket" class="group">
+          <p class="group-head"><span class="on"></span>내 응원팀</p>
+          <WeatherCard
+            :city-item="myTicket"
+            :is-opened="openedId === myTicket.id"
+            class="big"
+            @select-card="selectCard"
+            @click-detail="goDetail"
+          >
+            <GameScore :game="gameStore.findGame(myTicket.id)" compact />
+          </WeatherCard>
+        </section>
 
-    <!-- 오늘 경기가 열리는 구장이 먼저, 쉬는 구장은 아래로 -->
-    <section v-if="playingList.length > 0" class="group">
-      <p class="group-head"><span class="on"></span>오늘 경기 {{ playingList.length }}</p>
-      <div class="ticket-grid">
-        <WeatherCard
-          v-for="item in playingList"
-          :key="item.id"
-          :city-item="item"
-          :is-opened="openedId === item.id"
-          @select-card="selectCard"
-          @click-detail="goDetail"
-        >
-          <GameScore :game="gameStore.findGame(item.id)" compact />
-        </WeatherCard>
+        <BaseDashboardCard>
+          <SearchBar
+            :keyword="searchQuery"
+            :total-count="ticketList.length"
+            :result-count="filteredWeatherList.length"
+            @update-query="searchQuery = $event"
+          />
+        </BaseDashboardCard>
+
+        <section v-if="playingList.length > 0" class="group">
+          <p class="group-head"><span class="on"></span>오늘 경기 {{ playingList.length }}</p>
+          <div class="ticket-grid">
+            <WeatherCard
+              v-for="item in playingList"
+              :key="item.id"
+              :city-item="item"
+              :is-opened="openedId === item.id"
+              @select-card="selectCard"
+              @click-detail="goDetail"
+            >
+              <GameScore :game="gameStore.findGame(item.id)" compact />
+            </WeatherCard>
+          </div>
+        </section>
+
+        <section v-if="restingList.length > 0" class="group">
+          <p class="group-head off">오늘 경기 없음 {{ restingList.length }}</p>
+          <div class="ticket-grid">
+            <WeatherCard
+              v-for="item in restingList"
+              :key="item.id"
+              :city-item="item"
+              :is-opened="openedId === item.id"
+              @select-card="selectCard"
+              @click-detail="goDetail"
+            >
+              <GameScore :game="gameStore.findGame(item.id)" compact />
+            </WeatherCard>
+          </div>
+        </section>
+
+        <p v-if="filteredWeatherList.length === 0" class="status-bar">찾는 구장이 없습니다.</p>
       </div>
-    </section>
 
-    <section v-if="restingList.length > 0" class="group">
-      <p class="group-head off">오늘 경기 없음 {{ restingList.length }}</p>
-      <div class="ticket-grid">
-        <WeatherCard
-          v-for="item in restingList"
-          :key="item.id"
-          :city-item="item"
-          :is-opened="openedId === item.id"
-          @select-card="selectCard"
-          @click-detail="goDetail"
-        >
-          <GameScore :game="gameStore.findGame(item.id)" compact />
-        </WeatherCard>
-      </div>
-    </section>
-
-    <p v-if="filteredWeatherList.length === 0" class="status-bar">찾는 구장이 없습니다.</p>
+      <!-- 옆에 구단 순위표 -->
+      <aside class="side-col">
+        <RankTable :rank-list="rankList" :my-team="myTeamCode" />
+      </aside>
+    </div>
 
     <p class="status-bar">{{ selectedCityInfo }}</p>
   </div>
@@ -390,13 +441,51 @@ h1 {
   color: var(--green);
 }
 
+/* ── 두 칸: 왼쪽 구장, 오른쪽 순위표 ───────────── */
+.cols {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 244px;
+  align-items: start;
+  gap: 16px;
+}
+.main-col {
+  min-width: 0;
+}
+.side-col {
+  position: sticky;
+  top: 0;
+}
+/* 좁으면 순위표를 아래로 내린다 */
+@media (max-width: 900px) {
+  .cols {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .side-col {
+    position: static;
+  }
+}
+
 /* ── 목록 ──────────────────────────────────── */
 /* 티켓은 비율이 있어야 표처럼 보인다. 가로로 늘이지 않고 격자로 깐다. */
 .ticket-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(288px, 100%), 1fr));
   align-items: start;
-  gap: 14px;
+  gap: 12px;
+}
+/* 응원팀 티켓만 한 줄을 다 쓰고 글씨도 크게 */
+.big :deep(.temp) {
+  font-size: 38px;
+}
+.big :deep(.stadium) {
+  font-size: 17px;
+}
+.big :deep(.stub) {
+  width: 84px;
+}
+.big :deep(.logo) {
+  width: 44px;
+  height: 44px;
 }
 .group {
   margin-bottom: 16px;

@@ -7,10 +7,10 @@ import UnitToggler from './components/exercise/UnitToggler.vue'
   <!-- 구장 전광판을 본떴다. 검은 판에 도트 글씨, 구단 색은 왼쪽 띠로만 쓴다. -->
   <div class="board">
     <header class="top">
+      <!-- 로고가 첫 화면(구장) 역할을 하므로 메뉴에 따로 두지 않는다 -->
       <RouterLink to="/" class="logo">PLAY BALL</RouterLink>
 
       <nav class="menu">
-        <RouterLink to="/">구장</RouterLink>
         <RouterLink to="/games">오늘 경기</RouterLink>
         <RouterLink to="/saju">운명의 선수</RouterLink>
         <RouterLink to="/about">정보</RouterLink>
@@ -123,6 +123,10 @@ button:hover {
 }
 .logo:hover {
   text-shadow: 0 0 20px rgba(255, 176, 32, 0.9);
+}
+/* 첫 화면일 때는 로고에 불이 들어온 것처럼 */
+.logo.router-link-exact-active {
+  text-shadow: 0 0 22px rgba(255, 176, 32, 0.85);
 }
 .menu {
   display: flex;

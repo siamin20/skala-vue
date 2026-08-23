@@ -18,6 +18,12 @@ const STADIUM_TO_CITY = {
   창원: 'changwon',
 }
 
+// 구단 순위표. 네이버 주소가 Origin 이 붙으면 막혀서 백엔드를 거친다.
+export const getRank = async () => {
+  const response = await axios.get(`${BASE_URL}/api/teams/rank`, { timeout: 45000 })
+  return response.data
+}
+
 // 생년월일로 사주 네 기둥을 받아 온다.
 // 연주·월주는 절기 기준이라 날짜 계산으로 구할 수 없어 백엔드가 만세력을 대신 조회해 준다.
 export const getSaju = async (year, month, day) => {
