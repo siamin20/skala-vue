@@ -85,7 +85,8 @@ li {
   grid-template-columns: 26px 3px minmax(0, 1fr) 40px 34px 32px 38px;
   align-items: center;
   gap: 10px;
-  padding: 0 12px;
+  /* 오른쪽 여백을 조금 더 줘서 숫자와 점이 왼쪽으로 붙게 한다 */
+  padding: 0 18px 0 12px;
 }
 .rank-cols {
   margin: 0;
