@@ -99,12 +99,10 @@ li {
   color: var(--line);
 }
 .c-no,
+.c-rec,
 .c-rate,
 .c-gb {
   text-align: right;
-}
-.c-rec {
-  text-align: left;
 }
 .c-five {
   text-align: center;
