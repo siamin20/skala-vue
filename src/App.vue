@@ -7,7 +7,7 @@ import UnitToggler from './components/exercise/UnitToggler.vue'
   <!-- 구장 전광판을 본떴다. 검은 판에 도트 글씨, 구단 색은 왼쪽 띠로만 쓴다. -->
   <div class="board">
     <header class="top">
-      <span class="logo">PLAY BALL</span>
+      <RouterLink to="/" class="logo">PLAY BALL</RouterLink>
 
       <nav class="menu">
         <RouterLink to="/">구장</RouterLink>
@@ -63,9 +63,23 @@ body {
 
 <style scoped>
 .board {
+  position: relative;
   display: flex;
   flex-direction: column;
   height: 100vh;
+}
+/* 전광판을 가까이서 보면 보이는 주사선. 아주 옅게 깔아 질감만 준다. */
+.board::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.014) 0 1px,
+    transparent 1px 3px
+  );
 }
 
 /* ── 전광판 머리 ────────────────────────────── */
@@ -79,12 +93,18 @@ body {
   border-bottom: 1px solid var(--line);
   background-color: var(--panel);
 }
+/* 전광판 전구가 켜진 것처럼 글씨 둘레를 번지게 한다 */
 .logo {
   flex-shrink: 0;
   font-family: 'Galmuri11', sans-serif;
   font-size: 15px;
   color: var(--amber);
   letter-spacing: 0.02em;
+  text-decoration: none;
+  text-shadow: 0 0 14px rgba(255, 176, 32, 0.55);
+}
+.logo:hover {
+  text-shadow: 0 0 20px rgba(255, 176, 32, 0.9);
 }
 .menu {
   display: flex;

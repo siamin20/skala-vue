@@ -340,6 +340,7 @@ h1 {
   font-weight: 400;
   line-height: 1;
   color: var(--amber);
+  text-shadow: 0 0 16px rgba(255, 176, 32, 0.45);
 }
 .stat b.warn {
   color: var(--red);

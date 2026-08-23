@@ -416,6 +416,7 @@ h1 {
   margin: 0;
   font-family: 'Galmuri11', sans-serif;
   color: var(--amber);
+  text-shadow: 0 0 34px rgba(255, 176, 32, 0.45);
   font-size: 84px;
   font-weight: 600;
   line-height: 0.95;

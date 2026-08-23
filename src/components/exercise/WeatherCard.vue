@@ -234,6 +234,7 @@ const stubStyle = computed(() => {
   font-size: 30px;
   line-height: 1;
   color: var(--amber);
+  text-shadow: 0 0 16px rgba(255, 176, 32, 0.4);
 }
 .unit {
   margin-left: 1px;
