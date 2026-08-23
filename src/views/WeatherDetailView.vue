@@ -303,7 +303,7 @@ const goHome = () => {
     transform: scale(0.7);
   }
   to {
-    opacity: 0.34;
+    opacity: 0.62;
     transform: scale(1);
   }
 }
@@ -324,10 +324,10 @@ const goHome = () => {
   top: 52px;
   left: 0;
   right: 0;
-  height: 340px;
+  height: 460px;
   z-index: 0;
-  opacity: 0.34;
-  filter: blur(58px);
+  opacity: 0.62;
+  filter: blur(46px);
   pointer-events: none;
 }
 /* 머리말이 배경보다 살짝 늦게 올라온다 */
