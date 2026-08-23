@@ -118,6 +118,53 @@ const hasScore = computed(() => {
       </div>
     </div>
 
+    <!-- 이닝별 전광판. 백엔드가 못 받아오면 없으므로 있을 때만 그린다. -->
+    <div v-if="game.board" class="linescore">
+      <table>
+        <thead>
+          <tr>
+            <th class="nm"></th>
+            <th v-for="(n, i) in game.board.awayByInning.length" :key="i">{{ i + 1 }}</th>
+            <th class="sum">R</th>
+            <th class="sum">H</th>
+            <th class="sum">E</th>
+            <th class="sum">B</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="nm">{{ shortName(game.away.name) }}</td>
+            <td
+              v-for="(v, i) in game.board.awayByInning"
+              :key="i"
+              :class="{ run: v !== '0' && v !== '-' }"
+            >
+              {{ v }}
+            </td>
+            <td v-for="(v, i) in game.board.awayRheb" :key="`ar${i}`" class="sum">{{ v }}</td>
+          </tr>
+          <tr>
+            <td class="nm">{{ shortName(game.home.name) }}</td>
+            <td
+              v-for="(v, i) in game.board.homeByInning"
+              :key="i"
+              :class="{ run: v !== '0' && v !== '-' }"
+            >
+              {{ v }}
+            </td>
+            <td v-for="(v, i) in game.board.homeRheb" :key="`hr${i}`" class="sum">{{ v }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p class="starters">
+        <span v-if="game.board.awayStarter">
+          선발 {{ game.board.awayStarter }} vs {{ game.board.homeStarter }}
+        </span>
+        <span v-if="game.board.channel" class="ch">중계 {{ game.board.channel }}</span>
+      </p>
+    </div>
+
     <p v-if="game.note" class="note">{{ game.note }}</p>
   </div>
 </template>
@@ -256,6 +303,56 @@ const hasScore = computed(() => {
   font-weight: 600;
   letter-spacing: -0.01em;
   white-space: nowrap;
+}
+
+/* 이닝별 전광판 — 진짜 구장 전광판처럼 칸을 나눈다 */
+.linescore {
+  margin-top: 12px;
+  overflow-x: auto;
+}
+.linescore table {
+  border-collapse: collapse;
+  width: 100%;
+  font-family: 'Galmuri11', monospace;
+  font-size: 11px;
+}
+.linescore th,
+.linescore td {
+  min-width: 22px;
+  padding: 4px 2px;
+  border: 1px solid var(--line);
+  text-align: center;
+  color: var(--text);
+}
+.linescore th {
+  font-weight: 400;
+  color: var(--muted);
+  background-color: var(--ink);
+}
+.linescore .nm {
+  min-width: 46px;
+  text-align: left;
+  padding-left: 7px;
+  white-space: nowrap;
+}
+/* 점수가 난 이닝은 불이 들어온 것처럼 */
+.linescore .run {
+  color: var(--amber);
+  background-color: rgba(255, 176, 32, 0.08);
+}
+.linescore .sum {
+  background-color: var(--ink);
+}
+.starters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin: 8px 0 0 0;
+  font-size: 11px;
+  color: var(--muted);
+}
+.starters .ch {
+  margin-left: auto;
 }
 
 .note {
