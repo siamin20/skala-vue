@@ -450,7 +450,7 @@ h1 {
 /* ── 두 칸: 왼쪽 구장, 오른쪽 순위표 ───────────── */
 .cols {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 244px;
+  grid-template-columns: minmax(0, 1fr) 300px;
   align-items: start;
   gap: 16px;
 }

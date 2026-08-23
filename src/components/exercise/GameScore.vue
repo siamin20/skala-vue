@@ -231,8 +231,8 @@ const hasScore = computed(() => {
   color: var(--text);
 }
 .line-starter {
-  font-size: 10.5px;
-  color: var(--muted);
+  font-size: 12.5px;
+  color: var(--text);
 }
 .mid {
   flex-shrink: 0;
