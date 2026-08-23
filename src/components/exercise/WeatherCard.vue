@@ -97,11 +97,6 @@ const stubStyle = computed(() => {
         </span>
       </p>
 
-      <!-- 선발 투수. 직관 갈지 정할 때 보는 정보라 앞면에 둔다. -->
-      <p v-if="cityItem.awayStarter" class="starter">
-        선발 {{ cityItem.awayStarter }} vs {{ cityItem.homeStarter }}
-      </p>
-
       <!-- 비 예보가 있을 때만 나온다. 이 앱이 답하려는 질문이라 티켓 앞면에 둔다. -->
       <p v-if="cityItem.rain" class="rain" :class="cityItem.rain.level">
         ☔ {{ cityItem.rain.text }}
@@ -259,12 +254,6 @@ const stubStyle = computed(() => {
   color: var(--green);
 }
 .when.off {
-  color: var(--muted);
-}
-
-.starter {
-  margin: 0 0 8px 0;
-  font-size: 10.5px;
   color: var(--muted);
 }
 
