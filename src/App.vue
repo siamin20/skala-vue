@@ -46,7 +46,9 @@ import UnitToggler from './components/exercise/UnitToggler.vue'
 body {
   display: block;
   margin: 0;
-  padding: 18px 0 26px 0;
+  padding: 0;
+  height: 100vh;
+  overflow: hidden;
   background-color: #cfe6f5;
   font-family:
     'Galmuri11',
@@ -71,18 +73,24 @@ body {
 /* ── 기계 몸통 ───────────────────────────────
    마메치처럼 둥근 몸에 귀 두 개를 얹고, 가운데를 액정으로 판다.
    페이지 자체는 움직이지 않고 액정 안쪽만 굴러가게 해서 스크롤을 줄인다. */
+/* 기기를 화면 높이에 정확히 맞춰서 페이지가 스크롤되지 않게 한다.
+   남는 높이는 전부 액정이 가져가고, 넘치는 내용은 액정 안에서만 굴러간다. */
 .machine {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
   width: min(1040px, 96vw);
+  height: 100vh;
   margin: 0 auto;
-  padding: 92px 0 0 0;
+  padding: 74px 0 10px 0;
 }
 /* 귀 — 마메치는 위로 솟은 남색 귀 두 개다 */
 .ear {
   position: absolute;
   top: 0;
-  width: 78px;
-  height: 132px;
+  width: 70px;
+  height: 108px;
   background-color: #004c86;
   border-radius: 50% 50% 44% 44% / 62% 62% 22% 22%;
 }
@@ -99,7 +107,11 @@ body {
 .shell {
   position: relative;
   z-index: 1;
-  padding: 24px 26px 14px 26px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  padding: 20px 24px 10px 24px;
   border: 9px solid #004c86;
   border-radius: 46% 46% 40% 40% / 30% 30% 26% 26%;
   background-color: #fff89e;
@@ -110,9 +122,9 @@ body {
 .shell::after {
   content: '';
   position: absolute;
-  bottom: 30px;
-  width: 74px;
-  height: 40px;
+  bottom: 16px;
+  width: 66px;
+  height: 32px;
   border-radius: 50%;
   background-color: #f5b4ae;
 }
@@ -125,7 +137,10 @@ body {
 
 /* 액정 테두리 */
 .bezel {
-  padding: 12px;
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  padding: 10px;
   border: 6px solid #004c86;
   border-radius: 22px;
   background-color: #004c86;
@@ -133,7 +148,9 @@ body {
 .screen {
   display: flex;
   flex-direction: column;
-  height: min(72vh, 720px);
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
   border-radius: 12px;
   background-color: #fdfbe9;
   overflow: hidden;
@@ -201,12 +218,13 @@ body {
 .pad {
   display: flex;
   justify-content: center;
-  gap: 34px;
-  padding: 14px 0 8px 0;
+  gap: 30px;
+  flex-shrink: 0;
+  padding: 10px 0 2px 0;
 }
 .btn {
-  width: 40px;
-  height: 40px;
+  width: 34px;
+  height: 34px;
   border: 4px solid #004c86;
   border-radius: 50%;
   background: radial-gradient(circle at 36% 32%, #fff 0 22%, #f5b4ae 24% 100%);
@@ -217,12 +235,12 @@ body {
 }
 
 @media (max-width: 720px) {
-  .ear {
-    width: 62px;
-    height: 62px;
+  .machine {
+    padding-top: 52px;
   }
-  .screen {
-    height: 74vh;
+  .ear {
+    width: 52px;
+    height: 78px;
   }
 }
 </style>
