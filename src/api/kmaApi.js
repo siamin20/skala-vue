@@ -92,10 +92,9 @@ export const getShortForecast = async (nx, ny) => {
     byTime[fcstTime] = slot
   }
 
-  // 시각 순으로 세워서 돌려준다
-  return Object.entries(byTime)
-    .sort(([a], [b]) => (a > b ? 1 : -1))
-    .map(([, slot]) => slot)
+  // 기상청이 이미 시각 순으로 주므로 받은 차례를 그대로 쓴다.
+  // 글자로 정렬하면 자정을 넘길 때 '0000' 이 '1900' 보다 앞으로 가 버린다.
+  return Object.entries(byTime).map(([, slot]) => slot)
 }
 
 // 6. 경기 시각에 비가 오는지 한 줄로 판정한다.
