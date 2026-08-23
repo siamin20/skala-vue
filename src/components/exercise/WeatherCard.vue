@@ -66,7 +66,6 @@ const stubStyle = computed(() => {
         @error="logoFailed = true"
       />
       <span v-else class="face">{{ cityItem.emoji }}</span>
-      <span class="stub-word">직관권</span>
     </div>
 
     <div class="body">
@@ -176,19 +175,12 @@ const stubStyle = computed(() => {
   border-radius: 8px 0 0 8px;
 }
 .logo {
-  width: 34px;
-  height: 34px;
+  width: 40px;
+  height: 40px;
   object-fit: contain;
 }
 .face {
   font-size: 26px;
-}
-.stub-word {
-  font-family: 'Galmuri11', sans-serif;
-  font-size: 8.5px;
-  letter-spacing: 0.14em;
-  color: #fff;
-  white-space: nowrap;
 }
 /* 절취선 */
 .stub::after {

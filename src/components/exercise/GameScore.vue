@@ -79,8 +79,13 @@ const hasScore = computed(() => {
           <template v-if="hasScore">{{ game.awayScore }} : {{ game.homeScore }}</template>
           <template v-else>vs</template>
         </span>
-        <span class="nm right">{{ shortName(game.home.name) }}</span>
+        <span class="nm">{{ shortName(game.home.name) }}</span>
         <span class="bar" :style="{ backgroundColor: game.home.color }"></span>
+      </span>
+
+      <!-- 선발 투수도 함께. 직관 갈지 정할 때 보는 정보다. -->
+      <span v-if="game.board && game.board.awayStarter" class="line-starter">
+        선발 {{ game.board.awayStarter }} vs {{ game.board.homeStarter }}
       </span>
     </template>
   </div>
@@ -184,7 +189,7 @@ const hasScore = computed(() => {
   margin: 0;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 11.5px;
-  color: var(--line);
+  color: var(--text);
 }
 .none {
   color: var(--muted);
@@ -223,6 +228,11 @@ const hasScore = computed(() => {
   white-space: nowrap;
   text-overflow: ellipsis;
   font-weight: 600;
+  color: var(--text);
+}
+.line-starter {
+  font-size: 10.5px;
+  color: var(--muted);
 }
 .mid {
   flex-shrink: 0;
