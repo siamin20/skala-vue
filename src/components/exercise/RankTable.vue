@@ -43,6 +43,7 @@ const splitFive = (text) => {
       <span class="c-rate">승률</span>
       <span class="c-gb">GB</span>
       <span class="c-five">최근 5</span>
+      <span></span>
     </p>
 
     <p v-if="rankList.length === 0" class="rank-empty">순위를 불러오지 못했습니다</p>
@@ -58,6 +59,7 @@ const splitFive = (text) => {
         <span class="c-five five">
           <i v-for="(r, i) in splitFive(item.lastFive)" :key="i" :class="r.toLowerCase()"></i>
         </span>
+        <span></span>
       </li>
     </ul>
   </div>
@@ -82,11 +84,12 @@ const splitFive = (text) => {
 .rank-cols,
 li {
   display: grid;
-  grid-template-columns: 26px 3px minmax(0, 1fr) 40px 34px 32px 38px;
+  /* 팀 칸을 고정 폭으로 두고 남는 자리를 맨 끝에 몰아 준다.
+     팀 칸이 늘어나면 뒤의 숫자들이 오른쪽으로 밀려난다. */
+  grid-template-columns: 22px 3px 48px 46px 36px 30px 36px minmax(0, 1fr);
   align-items: center;
-  gap: 10px;
-  /* 오른쪽 여백을 조금 더 줘서 숫자와 점이 왼쪽으로 붙게 한다 */
-  padding: 0 18px 0 12px;
+  gap: 9px;
+  padding: 0 12px;
 }
 .rank-cols {
   margin: 0;
@@ -96,10 +99,12 @@ li {
   color: var(--line);
 }
 .c-no,
-.c-rec,
 .c-rate,
 .c-gb {
   text-align: right;
+}
+.c-rec {
+  text-align: left;
 }
 .c-five {
   text-align: center;
