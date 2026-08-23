@@ -48,7 +48,8 @@ const loadRain = async () => {
     }
     try {
       const forecast = await getShortForecast(stadium.nx, stadium.ny)
-      const risk = rainRisk(forecast, '18:30')
+      const game = gameStore.findGame(stadium.id)
+      const risk = rainRisk(forecast, game ? game.startTime : '')
       if (risk && risk.level !== 'none') {
         rainMap.value = { ...rainMap.value, [stadium.id]: risk }
       }
@@ -132,6 +133,8 @@ const openedId = ref('')
 const ticketList = computed(() => {
   return stadiumList.map((stadium) => {
     const weather = weatherList.value.find((item) => item.id === stadium.id)
+    // 경기 시각과 선발은 백엔드가 준다. 없으면 빈 값으로 둔다.
+    const game = gameStore.findGame(stadium.id)
     // API 는 Clear / Clouds / Rain 같은 영문 값을 준다. 목업은 sky 가 없어 status 로 판단한다.
     const sky = weather.sky ? weather.sky : weather.status
     let skyIcon = '☀️'
@@ -161,6 +164,9 @@ const ticketList = computed(() => {
       emoji: stadium.emoji,
       skyIcon: skyIcon,
       rain: rainMap.value[stadium.id],
+      startTime: game ? game.startTime : '',
+      awayStarter: game && game.board ? game.board.awayStarter : '',
+      homeStarter: game && game.board ? game.board.homeStarter : '',
     }
   })
 })

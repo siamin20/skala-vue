@@ -220,7 +220,7 @@ const goHome = () => {
         <span>{{ weather.status }}</span>
         <span>습도 {{ weather.humidity }}%</span>
         <span>바람 {{ weather.wind }}m/s</span>
-        <span>{{ weather.hasGame ? '18:30 경기' : '오늘 경기 없음' }}</span>
+        <span>{{ game ? `${game.startTime} 경기` : '오늘 경기 없음' }}</span>
       </p>
 
       <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
